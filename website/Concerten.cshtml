@@ -1,0 +1,30 @@
+﻿@{
+    Page.Title = "Aankomende Concerten";
+    Layout = "_SiteLayout.cshtml";
+
+    // Open database connection
+    var db = Database.Open("Database");
+
+    // SQL statement
+    var statement = "SELECT * FROM Concerten WHERE datum > @0";
+    var selectedData = db.Query(statement, DateTime.Now);
+
+    // Create a table (WebGrid) with coming concerts
+    var grid = new WebGrid(source: selectedData, defaultSort: "Datum");
+    grid.SortDirection = SortDirection.Ascending;
+}
+<h2>Aankomende concerten</h2>
+<div>
+    @grid.GetHtml(
+        tableStyle: "grid",
+        headerStyle: "head",
+        alternatingRowStyle: "alt",
+        columns: grid.Columns(
+            grid.Column("Naam"),
+            grid.Column("Beschrijving"),
+            grid.Column("Prijs"),
+            grid.Column("Datum")
+            )
+        )
+</div>
+
