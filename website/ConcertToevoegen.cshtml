@@ -1,0 +1,76 @@
+﻿@{
+    Page.Title = "Concert Toevoegen";
+    Layout = "_SiteLayout.cshtml"; // Dit is de standaard SiteLayout.cshtml, deze moeten we zelf aanpassen naar onze wensen
+
+    // Open database connection
+    var db = Database.Open("Database");
+
+    // Validation (misschien extra validatie? IsInt() etc...)
+    Validation.RequireFields("name", "description", "price", "theater", "date");
+
+    // Handle the POST request
+    if (IsPost)
+    {
+        if (Validation.IsValid())
+        {
+            // Read POST form values
+            var name = Request.Form["name"];
+            var description = Request.Form["description"];
+            var price = Request.Form["price"];
+            var theater = Request.Form["theater"];
+            var date = Request.Form["date"];
+
+            // SQL statement
+            var statement = "INSERT INTO Concerten (naam, beschrijving, prijs, zaal_nr, datum) VALUES (@0, @1, @2, @3, @4)";
+            db.Execute(statement, name, description, price, theater, date);
+
+            // Redirect to coming concerts
+            Response.Redirect("~/ConcertToevoegen.cshtml");
+        }
+    }
+}
+<h2>Concert toevoegen</h2>
+@Html.ValidationSummary()
+<form method="post">
+    <fieldset>
+        <legend>Concert informatie</legend>
+        <p>
+            <label for="name">Naam:</label> <br />
+            <input type="text" name="name" value="@Request.Form["name"]" />
+            @Html.ValidationMessage("name")
+        </p>
+
+        <p>
+            <label for="description">Beschrijving:</label> <br />
+            <textarea name="description" rows="4" cols="50"></textarea>
+            @Html.ValidationMessage("description")
+        </p>
+
+        <p>
+            <label for="price">Prijs:</label> <br />
+            <input type="number" name="price" step="0.01" min="0.01" max="99" />
+            @Html.ValidationMessage("price")
+        </p>
+
+        <p>
+            <label for="theater">Zaal:</label> <br />
+            <select name="theater">
+                @foreach(var item in db.Query("SELECT * FROM Zalen"))
+                {
+                    <option value="@item.zaal_nr">Zaal @item.zaal_nr: @item.aantal_plekken plekken</option>
+                }
+            </select>
+            @Html.ValidationMessage("theater")
+        </p>
+
+        <p>
+            <label for="date">Datum:</label> <br />
+            <input type="date" name="date" />
+        </p>
+
+        <p>
+            <input type="submit" value="Concert toevoegen" />
+        </p>
+    </fieldset>
+</form>
+<p><a href="~/Default.cshtml">Terug naar het begin</a></p>
