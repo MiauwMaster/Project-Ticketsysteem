@@ -1,0 +1,68 @@
+﻿@{
+    Page.Title = "Zaal Toevoegen";
+    Layout = "_SiteLayout.cshtml"; // Dit is de standaard SiteLayout.cshtml, deze moeten we zelf aanpassen naar onze wensen
+
+    // Open database connection
+    var db = Database.Open("Database");
+
+    // Validation (misschien extra validatie? IsInt() etc...)
+    Validation.RequireField("numberOfSpots", "U moet het aantal plekken in de zaal aangeven");
+
+    // Handle the POST request
+    if (IsPost)
+    {
+        if (Validation.IsValid())
+        {
+            // Read POST form values
+            var numberOfSpots = Request.Form["numberOfSpots"];
+
+            // SQL statement
+            var statement = "INSERT INTO Zalen (aantal_plekken) VALUES (@0)";
+            db.Execute(statement, numberOfSpots);
+
+            // Redirect to concerten toevoegen
+            Response.Redirect("~/ConcertToevoegen.cshtml");
+        }
+    }
+
+    // Huidige zalen weergeven
+    // SQL statement
+    var statementZalen = "SELECT * FROM Zalen";
+    var selectedData = db.Query(statementZalen);
+
+    // Create a table (WebGrid) with coming concerts
+    var grid = new WebGrid(source: selectedData, defaultSort: "zaal_nr");
+    grid.SortDirection = SortDirection.Ascending;
+}
+<h2>Zaal toevoegen</h2>
+@Html.ValidationSummary()
+<form method="post">
+    <fieldset>
+        <legend>Zaal informatie</legend>
+        <p>
+            <label for="numberOfSpots">Aantal plekken:</label> <br />
+            <input type="number" name="numberOfSpots" min="1" /> 
+        </p>
+
+        <p>
+            <input type="submit" value="Zaal toevoegen" />
+        </p>
+
+        <p>
+            * Een zaalnummer wordt automatisch toegewezen
+        </p>
+    </fieldset>
+</form>
+
+<h2>Zalen</h2>
+<div>
+    @grid.GetHtml(
+        tableStyle: "grid",
+        headerStyle: "head",
+        alternatingRowStyle: "alt",
+        columns: grid.Columns(
+            grid.Column("zaal_nr"),
+            grid.Column("aantal_plekken")
+            )
+        )
+</div>
