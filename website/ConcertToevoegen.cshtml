@@ -6,7 +6,7 @@
     var db = Database.Open("Database");
 
     // Validation (misschien extra validatie? IsInt() etc...)
-    Validation.RequireFields("name", "description", "price", "theater", "date");
+    Validation.RequireFields("name", "artist", "description", "price", "theater", "date");
 
     // Handle the POST request
     if (IsPost)
@@ -15,14 +15,15 @@
         {
             // Read POST form values
             var name = Request.Form["name"];
+            var artist = Request.Form["artist"];
             var description = Request.Form["description"];
             var price = Request.Form["price"];
             var theater = Request.Form["theater"];
             var date = Request.Form["date"];
 
             // SQL statement
-            var statement = "INSERT INTO Concerten (naam, beschrijving, prijs, zaal_nr, datum) VALUES (@0, @1, @2, @3, @4)";
-            db.Execute(statement, name, description, price, theater, date);
+            var statement = "INSERT INTO Concerten (naam, artiest, beschrijving, prijs, zaal_nr, datum) VALUES (@0, @1, @2, @3, @4, @5)";
+            db.Execute(statement, name, artist, description, price, theater, date);
 
             // Redirect to coming concerts
             Response.Redirect("~/Concerten.cshtml");
@@ -35,9 +36,15 @@
     <fieldset>
         <legend>Concert informatie</legend>
         <p>
-            <label for="name">Naam:</label> <br />
+            <label for="name">Concert naam:</label> <br />
             <input type="text" name="name" value="@Request.Form["name"]" />
             @Html.ValidationMessage("name")
+        </p>
+
+        <p>
+            <label for="artist">Artiest:</label>
+            <input type="text" name="artist" value="@Request.Form["artist"]" />
+            @Html.ValidationMessage("artist")
         </p>
 
         <p>

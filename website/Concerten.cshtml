@@ -21,9 +21,11 @@
         alternatingRowStyle: "alt",
         columns: grid.Columns(
             grid.Column("Naam"),
+            grid.Column("Artiest"),
             grid.Column("Beschrijving"),
             grid.Column("Prijs"),
-            grid.Column("Datum")
+            grid.Column("Datum"),
+            grid.Column(format: @<a href="~/TicketBestellen.cshtml?id=@item.ID">Bestel</a>)
             )
         )
 </div>

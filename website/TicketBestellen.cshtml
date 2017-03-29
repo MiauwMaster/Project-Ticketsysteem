@@ -1,0 +1,146 @@
+﻿@{
+    Page.Title = "Ticket Bestellen";
+    Layout = "~/_SiteLayout.cshtml";
+
+    // Open database connection
+    var db = Database.Open("Database");
+
+    // Variables
+    var concertId = 0;
+    var name = "";
+    var artist = "";
+    var description = "";
+    var price = Decimal.One;
+    var date = DateTime.Now;
+
+    if (!IsPost)
+    {
+        if (!Request.QueryString["id"].IsEmpty() && Request.QueryString["id"].IsInt())
+        {
+            // Concert ID from query string (GET value)
+            concertId = Convert.ToInt32(Request.QueryString["id"]);
+
+            // SQL statement
+            var statement = "SELECT * FROM Concerten WHERE id = @0";
+            var row = db.QuerySingle(statement, concertId);
+
+            if (row != null)
+            {
+                name = row.naam;
+                artist = row.artiest;
+                description = row.beschrijving;
+                price = row.prijs;
+                date = row.datum;
+            }
+            else
+            {
+                Validation.AddFormError("Geen concert geselecteerd.");
+            }
+        }
+        else
+        {
+            Validation.AddFormError("Geen concert geselecteerd.");
+        }
+    }
+
+    if (IsPost)
+    {
+        // Validation
+        Validation.RequireFields("concertId", "email", "numberOfTickets", "numberOfDiscountTickets");
+
+        // Read POST form values
+        concertId = Convert.ToInt32(Request.Form["concertId"]);
+        var email = Request.Form["email"];
+        var numberOfTickets = Convert.ToInt32(Request.Form["numberOfTickets"]);
+        var numberOfDiscountTickets = Convert.ToInt32(Request.Form["numberOfDiscountTickets"]);
+
+        if (Validation.IsValid())
+        {
+            // SQL statement for bestelling insertion
+            var statementBestelling = "INSERT INTO Bestellingen (email) VALUES (@0)";
+            db.Execute(statementBestelling, email);
+            var bestelNr = Convert.ToInt32(db.QueryValue("SELECT @@IDENTITY")); // @@IDENTITY retrieves last auto generated id (auto_incremented) of this (current) connection
+
+            // SQL statement for ticket insertion
+            var statementTicket = "INSERT INTO Tickets (kindOf65plus, concertId, bestel_nr) VALUES (@0, @1, @2)";
+
+            // TODO: Dit moet pas na de betaling gebeuren!!!
+            // Add regular tickets to database
+            for (int i = 0; i < numberOfTickets; i++)
+            {
+                db.Execute(statementTicket, 0, concertId, bestelNr);
+            }
+
+            // Add discount tickets to database
+            for (int i = 0; i < numberOfDiscountTickets; i++)
+            {
+                db.Execute(statementTicket, 1, concertId, bestelNr);
+            }
+
+            Response.Redirect("~/Bestelling.cshtml?id=" + @bestelNr); 
+        }
+    }
+}
+<h2>Ticket Bestellen</h2>
+@Html.ValidationSummary()
+<form method="post">
+    <fieldset>
+        <legend>Ticket Informatie</legend>
+        <p>
+            <label for="name">Concert naam:</label>
+            <input type="text" name="name" value="@name" readonly />
+        </p>
+
+        <p>
+            <label for="artist">Artiest:</label>
+            <input type="text" name="artist" value="@artist" readonly />
+        </p>
+
+        <p>
+            <label for="description">Beschrijving:</label>
+            <textarea name="description" rows="4" cols="50" readonly>@description</textarea>
+        </p>
+
+        <p>
+            <label for="price">Prijs</label>
+            <input type="text" name="price" value="&euro;@price" readonly />
+        </p>
+
+        <p>
+            <label for="date">Datum en tijd:</label>
+            <input type="text" name="date" value="@date" readonly />
+        </p>
+
+        <input type="hidden" name="concertId" value="@concertId" />
+
+    </fieldset>
+
+    <fieldset>
+        <legend>Uw gegevens:</legend>
+        <p>
+            <label for="email">Uw e-mailadres</label>
+            <input type="email" name="email" value="@Request.Form["email"]" required />
+            @Html.ValidationMessage("email")
+        </p>
+
+        <p>
+            <label for="numberOfTickets">Aantal reguliere tickets</label>
+            <input type="number" name="numberOfTickets" min="0" value="@Request.Form["numberOfTickets"]" required />
+            @Html.ValidationMessage("numberOfTickets")
+        </p>
+
+        <p>
+            <label for="numberOfDiscountTickets">Tickets met korting *</label>
+            <input type="number" name="numberOfDiscountTickets" min="0" value="@Request.Form["numberOfDiscountTickets"]" required />
+            @Html.ValidationMessage("numberOfDiscountTickets")
+        </p>
+
+        <p>
+            <input type="submit" value="Tickets toevoegen" />
+        </p>
+
+        <p>
+            * Alleen voor kinderen onder de 16 jaar en 65-plussers
+        </p>
+    </fieldset>
+</form>
