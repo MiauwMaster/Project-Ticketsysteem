@@ -32,8 +32,8 @@
             else if(isBetaald == true)
             {
                 //Set ticket used
-                data.gebruikt = true;
                 message = "Ticket is betaald en ingescand. Veel plezier bij het concert!";
+                db.ExecuteSqlCommand("UPDATE Tickets SET gebruikt = TRUE where id = @0", ticketID);
             }
         }
     }
