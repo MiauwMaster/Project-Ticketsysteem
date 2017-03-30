@@ -1,0 +1,102 @@
+@using System.Drawing;
+@using iTextSharp.text;
+@using iTextSharp.text.pdf;
+@using QRCoder;
+@{
+    //Variables
+    var artiest = "";
+    var foto = "";
+    var datum = "";
+    var zaal = "";
+    var prijs = 0;
+
+    // Open database connection
+    var db = Database.Open("Database");
+
+    //SQL Statement
+    var statement = "SELECT * FROM Concerten WHERE id = @0";
+    var data = db.QuerySingle(statement, /*TODO: Add id from last page*/)
+
+    var statement = ""
+
+    //Fill variables
+    artiest = data.naam;
+    foto = data.foto;
+    datum = data.datum;
+    zaal = data.zaal_nr;
+    prijs = data.prijs;
+
+    
+    renderQRCode();
+    string[] text = File.ReadAllLines(@"C:/users/muize/Desktop/concert.txt");
+    string[] endtexts = new string[text.Length];
+    int indi = 0;
+    string endtext = "";
+    int artiestID = 1;
+
+    foreach (string line in text)
+        {
+            if (line.StartsWith("Artiest"))
+                {
+                    continue;
+                }
+
+            string[] splitText = line.Split();
+            string artiest = splitText[0];
+            int zaalNr = Convert.ToInt32(splitText[2]);
+            DateTime date = Convert.ToDateTime(splitText[4] + " " + splitText[5]);
+            string[] text2 = InfoOpslaan(artiest, zaalNr, date);
+            for (int i = 0; i < text2.Length; i++)
+                {
+                    endtext += text2[i];
+                    endtext += " ";
+                }
+            endtexts[indi] = endtext;
+            endtext = "";
+            indi++;
+        }
+        indi = 0;
+
+        Document doc = new Document();
+        try
+            {
+                PdfWriter.GetInstance(doc, new FileStream("C:/users/muize/screenshots/pdfjes.pdf", FileMode.Create));
+                doc.Open();
+
+                
+        var titleFont = FontFactory.GetFont("Verdana", 40, BaseColor.BLACK);
+        var parFont = FontFactory.GetFont("Verdana", 15, BaseColor.BLACK);
+        var paragraph1 = new Paragraph("Uw ticket", titleFont);
+        paragraph1.Alignment = Element.ALIGN_CENTER;
+        doc.Add(paragraph1);
+        var line = new Paragraph("______________________", titleFont);
+        line.Alignment = Element.ALIGN_CENTER;
+        doc.Add(line);
+        iTextSharp.text.Image jpg = iTextSharp.text.Image.GetInstance(renderQRCode(), BaseColor.WHITE); 
+        doc.Add(jpg);
+        artiestID = indi + 2;
+        var paragraph2 = new Paragraph(endtexts[indi + 1], parFont);
+        doc.Add(paragraph2);
+        iTextSharp.text.Image artist = iTextSharp.text.Image.GetInstance("C:/users/muize/screenshots/" + artiestID.ToString() + ".jpg");
+        doc.Add(artist);
+
+    }
+
+    catch (Exception ex)
+    {
+        //Log error;
+    }
+    finally
+    {
+        doc.Close();
+    }
+
+    private static System.Drawing.Image renderQRCode()
+    {
+        QRCodeGenerator qrGenerator = new QRCodeGenerator();
+        QRCodeData qrCodeData = qrGenerator.CreateQrCode("TODO: URL invoegen"+ @, QRCodeGenerator.ECCLevel.Q);
+        QRCode qrCode = new QRCode(qrCodeData);
+        System.Drawing.Image qrCodeImage = qrCode.GetGraphic(5);
+        return qrCodeImage;
+    }
+}
