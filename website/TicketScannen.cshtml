@@ -24,6 +24,9 @@
         var statement2 = "SELECT * FROM Bestellingen WHERE id = @0";
         var data2 = db.QuerySingle(statement2, data);
 
+        var statement3 = "SELECT gebruikt FROM Tickets WHERE id = @0";
+        var data3 = db.QueryValue(statement3, ticketID);
+
         if (data2 != null)
         {
             //Check payment status 
@@ -35,11 +38,18 @@
             else if(isBetaald == true)
             {
                 // Check if ticket is already used
-
+                if(data3 == true)
+                {
+                    message = "Ticket is al gebruikt!"
+                }
 
                 //Set ticket used
+                else
+                {
                 message = "Ticket is betaald en ingescand. Veel plezier bij het concert!";
                 db.Execute("UPDATE Tickets SET gebruikt = 1 WHERE id = @0", ticketID);
+                }
+               
             }
         }
     }
