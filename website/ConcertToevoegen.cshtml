@@ -89,15 +89,13 @@
 
         <p>
             <label for="photo">Foto:</label>
-            <input type="file" name="photo" value="@Request.Form["photo"]" required />
+            <input type="file" name="photo" value="@Request.Form["photo"]" accept="image/*" required />
         </p>
 
         <p>
             <label for="video">YouTube Video URL (optioneel)</label>
             <input type="text" name="video" value="@Request.Form["video"]" />
             @Html.ValidationMessage("video")
-            <!-- Voorbeeld: -->
-            <!-- <iframe width="560" height="315" src="https://www.youtube.com/embed/6JSMAbeUS-4" frameborder="0" allowfullscreen></iframe> -->
         </p>
 
         <p>
