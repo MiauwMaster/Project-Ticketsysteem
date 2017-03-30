@@ -1,0 +1,44 @@
+@{
+    Page.Title = "Ticket Scannen";
+    Layout = "_SiteLayout.cshtml";
+
+    // Open database connection
+    var db = Database.Open("Database");
+
+    //variables
+    var ticketID = 0;
+    var isBetaald = false;
+    var message = "Ticket niet gescand";
+
+     
+    if (!Request.QueryString["id"].IsEmpty() && Request.QueryString["id"].IsInt()) 
+    {
+        //Read URL
+        ticketID = Convert.ToInt32(Request.QueryString["id"]);
+        message = "Ticket is gelezen";
+        
+        //SQL
+        var statement = "SELECT * FROM Tickets";
+        var data = db.QuerySingle(statement, ticketID);
+
+        if (data != null)
+        {
+            //Check payment status 
+            isBetaald = data.betaald;
+            if(isBetaald == false)
+            {
+                message = "Ticket is nog niet betaald";
+            }
+            else if(isBetaald == true)
+            {
+                //Set ticket used
+                data.gebruikt = true;
+                message = "Ticket is betaald en ingescand. Veel plezier bij het concert!";
+            }
+        }
+    }
+
+}
+
+<p>Ticket betaald: @isBetaald</p>
+<p>@message</p>
