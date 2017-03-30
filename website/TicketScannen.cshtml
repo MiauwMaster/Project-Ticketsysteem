@@ -18,13 +18,16 @@
         message = "Ticket is gelezen";
         
         //SQL
-        var statement = "SELECT * FROM Tickets";
+        var statement = "SELECT * FROM Tickets WHERE id = @0";
         var data = db.QuerySingle(statement, ticketID);
+
+        var statement2 = "SELECT * FROM Bestellingen WHERE bestel_nr = @0";
+        var data2 = db.QuerySingle(statement2, data.bestel_nr);
 
         if (data != null)
         {
             //Check payment status 
-            isBetaald = data.betaald;
+            isBetaald = data2.betaald;
             if(isBetaald == false)
             {
                 message = "Ticket is nog niet betaald";
@@ -33,7 +36,7 @@
             {
                 //Set ticket used
                 message = "Ticket is betaald en ingescand. Veel plezier bij het concert!";
-                db.ExecuteSqlCommand("UPDATE Tickets SET gebruikt = TRUE where id = @0", ticketID);
+                db.Execute("UPDATE Tickets SET gebruikt = TRUE where id = @0", ticketID);
             }
         }
     }
