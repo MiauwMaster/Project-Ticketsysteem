@@ -12,6 +12,10 @@
     var description = "";
     var price = Decimal.One;
     var date = DateTime.Now;
+    var photo = "";
+    var video = "";
+    var useVideo = false;
+    var videoID = "";
 
     if (!IsPost)
     {
@@ -31,6 +35,22 @@
                 description = row.beschrijving;
                 price = row.prijs;
                 date = row.datum;
+                photo = row.foto;
+                video = row.video;
+
+                // Validate video URL (because video = optional)
+                try
+                {
+                    // Parse videoID from youtube video URL (for embedding it into iframe)
+                    var youtubeUri = new Uri(video);
+                    var query = HttpUtility.ParseQueryString(youtubeUri.Query);
+                    videoID = query["v"];
+                    useVideo = true;
+                }
+                catch
+                {
+
+                }
             }
             else
             {
@@ -86,6 +106,19 @@
 <form method="post">
     <fieldset>
         <legend>Ticket Informatie</legend>
+        <p>
+            <img src="@photo" alt="Foto" height="50" widht="50" />
+        </p>
+
+        @if (useVideo)
+        {
+            <p>
+                <iframe id="ytplayer" type="text/html" width="640" height="360"
+                        src="https://www.youtube.com/embed/@videoID?autoplay=0"
+                        frameborder="0"></iframe>
+            </p>
+        }
+        
         <p>
             <label for="name">Concert naam:</label>
             <input type="text" name="name" value="@name" readonly />
