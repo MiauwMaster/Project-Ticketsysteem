@@ -6,7 +6,7 @@
     var db = Database.Open("Database");
 
     // Validation (misschien extra validatie? IsInt() etc...)
-    Validation.RequireFields("name", "artist", "description", "price", "theater", "date", "video");
+    Validation.RequireFields("name", "artist", "description", "price", "theater", "date");
 
     // Handle the POST request
     if (IsPost)
@@ -21,7 +21,8 @@
             var theater = Request.Form["theater"];
             var date = Request.Form["date"];
             WebImage photo = WebImage.GetImageFromRequest();
-            var video = Request.Form["video"];
+            var video = "";
+            video = Request.Form["video"];
 
             // Image upload
             if (photo != null)
