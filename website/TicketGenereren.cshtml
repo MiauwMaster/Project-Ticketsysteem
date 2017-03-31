@@ -9,15 +9,19 @@
         var datum = "";
         var zaal = "";
         var prijs = 0;
+        var aantalTicketsInBestelling = 0;
+        var ticketID = 0;
+        var bestelNR = 0; // uit vorige pagina halen
 
         // Open database connection
         var db = Database.Open("Database");
 
         //SQL Statement
-        var statement = "SELECT * FROM Concerten WHERE id = @0";
+        var statement = "SELECT * FROM Concert WHERE id = @0";
         var data = db.QuerySingle(statement, /*TODO: Add id from last page*/);
 
-        var statement2 = "";
+        var statement2 = "SELECT COUNT(bestel_nr) FROM Tickets WHERE bestel_nr = @0";
+        var data2 = db.QueryValue(statement2, bestelNR);
 
         //Fill variables
         artiest = data.naam;
@@ -25,49 +29,64 @@
         datum = data.datum;
         zaal = data.zaal_nr;
         prijs = data.prijs;
-
-
-        renderQRCode();
+        aantalTicketsinBestelling = data2;
+        
 
         Document doc = new Document();
         try
         {
-            PdfWriter.GetInstance(doc, new FileStream("C:/users/muize/screenshots/pdfjes.pdf", FileMode.Create));
+            PdfWriter.GetInstance(doc, new FileStream("~/Tickets/"+bestelNR, FileMode.Create));
             doc.Open();
 
-
+            // Fonts
             var titleFont = FontFactory.GetFont("Verdana", 40, BaseColor.BLACK);
             var parFont = FontFactory.GetFont("Verdana", 15, BaseColor.BLACK);
-            var paragraph1 = new Paragraph("Uw ticket", titleFont);
-            paragraph1.Alignment = Element.ALIGN_CENTER;
-            doc.Add(paragraph1);
-            var line = new Paragraph("______________________", titleFont);
-            line.Alignment = Element.ALIGN_CENTER;
-            doc.Add(line);
-            iTextSharp.text.Image jpg = iTextSharp.text.Image.GetInstance(renderQRCode(), BaseColor.WHITE);
-            doc.Add(jpg);
-            var paragraph2 = new Paragraph(hoi, parFont);
-            doc.Add(paragraph2);
-            iTextSharp.text.Image artist = iTextSharp.text.Image.GetInstance("C:/users/muize/screenshots/1.jpg");
-            doc.Add(artist);
+            
+            for (int i = 0; i == aantalTicketsInBestelling; i++)
+            {
 
+                ticketID = ;// uit bestelling halen
+
+                // Create new page for each ticket
+                doc.NewPage();
+
+                // Print artist name as ticket title
+                var paragraph1 = new Paragraph(artiest, titleFont);
+                paragraph1.Alignment = Element.ALIGN_CENTER;
+                doc.Add(paragraph1);
+
+                // Horizontal line
+                var line = new Paragraph("______________________", titleFont);
+                line.Alignment = Element.ALIGN_CENTER;
+                doc.Add(line);
+
+                //Generate QR Code
+                QRCodeGenerator qrGenerator = new QRCodeGenerator();
+                QRCodeData qrCodeData = qrGenerator.CreateQrCode("TODO: URL invoegen"+ticketID, QRCodeGenerator.ECCLevel.Q);
+                QRCode qrCode = new QRCode(qrCodeData);
+                System.Drawing.Image qrCodeImage = qrCode.GetGraphic(5);
+
+                // Insert QR Code
+                iTextSharp.text.Image jpg = iTextSharp.text.Image.GetInstance(qrCodeImage, BaseColor.WHITE);
+                doc.Add(jpg);
+
+                // Insert rest of ticket info
+                var paragraph2 = new Paragraph(zaal + datum + prijs, parFont);
+                doc.Add(paragraph2);
+
+                // Add artist photo
+                iTextSharp.text.Image artist = iTextSharp.text.Image.GetInstance(foto);
+                doc.Add(artist);
+            }
         }
 
         catch (Exception ex)
         {
             //Log error;
+            System.Diagnostics.Debug.WriteLine(ex);
         }
         finally
         {
             doc.Close();
         } 
-
-    private static System.Drawing.Image renderQRCode()
-    {
-        QRCodeGenerator qrGenerator = new QRCodeGenerator();
-        QRCodeData qrCodeData = qrGenerator.CreateQrCode("TODO: URL invoegen", QRCodeGenerator.ECCLevel.Q);
-        QRCode qrCode = new QRCode(qrCodeData);
-        System.Drawing.Image qrCodeImage = qrCode.GetGraphic(5);
-        return qrCodeImage;
-    }
 }
