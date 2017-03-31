@@ -33,9 +33,8 @@
 
 
     Document doc = new Document(PageSize.A4, 25, 25, 30, 30);
-    MemoryStream msReport = new MemoryStream();
-    try
-    {
+
+    
         PdfWriter writer = PdfWriter.GetInstance(doc, new FileStream(Server.MapPath("Tickets") + "\\" + "test6.pdf", FileMode.Create));
         doc.Open();
 
@@ -49,7 +48,7 @@
             ticketID = 1;// uit bestelling halen
 
             // Create new page for each ticket
-
+            doc.NewPage();
 
             // Print artist name as ticket title
             var paragraph1 = new Paragraph(artiest, titleFont);
@@ -79,18 +78,8 @@
             // Add artist photo
             Image artist = Image.GetInstance(foto);
             doc.Add(artist);
-            doc.NewPage();
         }
-    }
-
-    catch (Exception ex)
-    {
-        //Log error;
-        System.Diagnostics.Debug.WriteLine(ex);
-    }
-
-    finally
-    {
+    
         doc.Close();
-    }
+
 }
