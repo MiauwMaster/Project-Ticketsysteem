@@ -76,28 +76,39 @@
 
         if (Validation.IsValid())
         {
+            // List of current tickets
+            List<Ticket> cart = new List<Ticket>();
+
             // SQL statement for bestelling insertion
             var statementBestelling = "INSERT INTO Bestellingen (email) VALUES (@0)";
             db.Execute(statementBestelling, email);
             var bestelNr = Convert.ToInt32(db.QueryValue("SELECT @@IDENTITY")); // @@IDENTITY retrieves last auto generated id (auto_incremented) of this (current) connection
 
             // SQL statement for ticket insertion
-            var statementTicket = "INSERT INTO Tickets (kindOf65plus, concertId, bestel_nr) VALUES (@0, @1, @2)";
+            //var statementTicket = "INSERT INTO Tickets (kindOf65plus, concertId, bestel_nr) VALUES (@0, @1, @2)";
 
             // TODO: Dit moet pas na de betaling gebeuren!!!
-            // Add regular tickets to database
+            // Add regular tickets to cart
             for (int i = 0; i < numberOfTickets; i++)
             {
-                db.Execute(statementTicket, 0, concertId, bestelNr);
+                Ticket ticket = new Ticket(concertId, bestelNr, false);
+                cart.Add(ticket);
+                //db.Execute(statementTicket, 0, concertId, bestelNr);
             }
 
-            // Add discount tickets to database
+            // Add discount tickets to cart
             for (int i = 0; i < numberOfDiscountTickets; i++)
             {
-                db.Execute(statementTicket, 1, concertId, bestelNr);
+                Ticket ticket = new Ticket(concertId, bestelNr, true);
+                cart.Add(ticket);
+                //db.Execute(statementTicket, 1, concertId, bestelNr);
             }
 
-            Response.Redirect("~/Bestelling.cshtml?id=" + @bestelNr);
+            // Store list of tickets in cart
+            Session["cart"] = cart; // var cart = (List<Ticket>)Session["cart"]; om terug te casten naar een Ticket List
+
+            // Redirect to cart
+            Response.Redirect("~/Winkelwagen.cshtml");
         }
     }
 }

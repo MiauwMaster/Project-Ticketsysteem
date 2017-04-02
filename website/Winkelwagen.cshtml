@@ -1,0 +1,39 @@
+﻿@{
+    Page.Title = "Winkelwagen";
+    Layout = "~/_SiteLayout.cshtml";
+
+    // Open database connection
+    var db = Database.Open("Database");
+
+    // Create empty list of tickets
+    List<Ticket> cart = new List<Ticket>();
+
+    // Check if cart exists in current session
+    if (Session["cart"] != null)
+    {
+        // Fill cart (List) with Tickets from session;
+        cart = (List<Ticket>)Session["cart"];
+    }
+}
+<h2>Winkelwagen</h2>
+@if (cart.Any())
+{
+    // Show all tickets in cart
+    //cart.Sort((t1, t2) => t1.Concert.CompareTo(t2.Concert));
+    foreach (Ticket ticket in cart)
+    {
+        var result = db.QuerySingle("SELECT * FROM Concerten WHERE id = @0", ticket.Concert);
+        var concertName = result.naam;
+        var concertPrice = result.prijs;
+        
+        <p>
+            @concertName - &euro; @concertPrice - Korting: @ticket.Korting 
+        </p>
+    }
+}
+else
+{
+    <p>
+        Geen tickets in winkelwagen
+    </p>
+}
