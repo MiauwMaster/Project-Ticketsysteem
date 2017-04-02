@@ -34,29 +34,30 @@
     var grid = new WebGrid(source: selectedData, defaultSort: "zaal_nr");
     grid.SortDirection = SortDirection.Ascending;
 }
-<h2>Zaal toevoegen</h2>
-@Html.ValidationSummary()
-<form method="post">
-    <fieldset>
-        <legend>Zaal informatie</legend>
-        <p>
-            <label for="numberOfSpots">Aantal plekken:</label>
-            <input type="number" name="numberOfSpots" min="1" /> 
-        </p>
+<div class="container">
+    <h2>Zaal toevoegen</h2>
+    @Html.ValidationSummary()
+    <form method="post">
+        <fieldset>
+            <legend>Zaal informatie</legend>
+            <p>
+                <label for="numberOfSpots">Aantal plekken:</label>
+                <input type="number" name="numberOfSpots" min="1" />
+            </p>
 
-        <p>
-            <input type="submit" value="Zaal toevoegen" />
-        </p>
+            <p>
+                <input type="submit" value="Zaal toevoegen" />
+            </p>
 
-        <p>
-            * Een zaalnummer wordt automatisch toegewezen
-        </p>
-    </fieldset>
-</form>
+            <p>
+                * Een zaalnummer wordt automatisch toegewezen
+            </p>
+        </fieldset>
+    </form>
 
-<h2>Zalen</h2>
-<div>
-    @grid.GetHtml(
+    <h2>Zalen</h2>
+    <div>
+        @grid.GetHtml(
         tableStyle: "grid",
         headerStyle: "head",
         alternatingRowStyle: "alt",
@@ -65,4 +66,5 @@
             grid.Column("aantal_plekken")
             )
         )
+    </div>
 </div>
