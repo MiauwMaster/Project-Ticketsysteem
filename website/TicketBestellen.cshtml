@@ -83,9 +83,12 @@
             var statementBestelling = "INSERT INTO Bestellingen (email) VALUES (@0)";
             db.Execute(statementBestelling, email);
             var bestelNr = Convert.ToInt32(db.QueryValue("SELECT @@IDENTITY")); // @@IDENTITY retrieves last auto generated id (auto_incremented) of this (current) connection
+            //Opslaan van variables in sessions zodat ze kunnen worden gebruikt in het ticket
+            Session["bestelnummer"] = bestelNr;
+            Session["concertid"] = concertId;
 
             // SQL statement for ticket insertion
-            //var statementTicket = "INSERT INTO Tickets (kindOf65plus, concertId, bestel_nr) VALUES (@0, @1, @2)";
+            var statementTicket = "INSERT INTO Tickets (kindOf65plus, concertId, bestel_nr) VALUES (@0, @1, @2)";
 
             // TODO: Dit moet pas na de betaling gebeuren!!!
             // Add regular tickets to cart
@@ -93,7 +96,7 @@
             {
                 Ticket ticket = new Ticket(concertId, bestelNr, false);
                 cart.Add(ticket);
-                //db.Execute(statementTicket, 0, concertId, bestelNr);
+                db.Execute(statementTicket, 0, concertId, bestelNr);
             }
 
             // Add discount tickets to cart
@@ -101,14 +104,16 @@
             {
                 Ticket ticket = new Ticket(concertId, bestelNr, true);
                 cart.Add(ticket);
-                //db.Execute(statementTicket, 1, concertId, bestelNr);
+                db.Execute(statementTicket, 1, concertId, bestelNr);
             }
+
+
 
             // Store list of tickets in cart
             Session["cart"] = cart; // var cart = (List<Ticket>)Session["cart"]; om terug te casten naar een Ticket List
 
             // Redirect to cart
-            Response.Redirect("~/Winkelwagen.cshtml");
+            Response.Redirect("~/TicketGenereren.cshtml");
         }
     }
 }
