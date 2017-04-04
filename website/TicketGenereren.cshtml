@@ -10,8 +10,9 @@
     var zaal = 0;
     var prijs = Decimal.One;
     var aantalTicketsInBestelling = 0;
-    var ticketID = 0;
-    var bestelNR = 0; // uit vorige pagina halen
+    int ticketID = 0;
+    var concertID = Session["concertid"];
+    int bestelNR = Convert.ToInt32(Session["bestelnummer"]); // uit vorige pagina halen
 
     // Open database connection
     var db = Database.Open("Database");
@@ -19,11 +20,16 @@
     // SQL Statement
     // Concert info
     var statement = "SELECT * FROM Concerten WHERE id = @0";
-    var data = db.QuerySingle(statement, 6); // ID FROM LAST PAGE
+    var data = db.QuerySingle(statement, concertID); // ID FROM LAST PAGE
 
     // Aantal tickets
     var statement2 = "SELECT COUNT(bestel_nr) FROM Tickets WHERE bestel_nr = @0";
     var data2 = db.QueryValue(statement2, bestelNR);
+
+    //Eerste ID met bestelnummer
+    var statement3 = "SELECT id FROM Tickets WHERE bestel_nr = @0";
+    var data3 = db.QuerySingle(statement3, bestelNR);
+
 
     //Fill variables
     artiest = data.naam;
@@ -32,12 +38,13 @@
     zaal = data.zaal_nr;
     prijs = data.prijs;
     aantalTicketsInBestelling = data2;
+    ticketID = data3.id;
 
 
     Document doc = new Document(PageSize.A4, 25, 25, 30, 30);
 
-    
-    PdfWriter writer = PdfWriter.GetInstance(doc, new FileStream(Server.MapPath("Tickets") + "\\" + bestelNR, FileMode.Create));
+
+    PdfWriter writer = PdfWriter.GetInstance(doc, new FileStream(Server.MapPath("Tickets") + "\\" + bestelNR + ".pdf", FileMode.Create));
     doc.Open();
 
     // Fonts
@@ -47,8 +54,8 @@
     for (int i = 0; i <= aantalTicketsInBestelling; i++)
     {
         // TicketID for QR url
-        ticketID = 1;// uit bestelling halen
-
+        ticketID += 1;//steeds met 1 verhoogd per ticket zodat je het juiste ticketID krijgt, kan misschien wel simpeler gemaakt worden
+       
         // Create new page for each ticket
         doc.NewPage();
 
@@ -90,8 +97,9 @@
             doc.Add(artist);
         }
     }
-    
+
     doc.Close();
 }
+@data
 
-<p><a href="~/Tickets/@"bestelNR"">Download ticket(s)</a> </p>
+
