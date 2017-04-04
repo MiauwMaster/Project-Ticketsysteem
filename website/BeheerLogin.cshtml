@@ -1,0 +1,53 @@
+﻿@{
+    Page.Title = "Beheer Login";
+    Layout = "_SiteLayout.cshtml";
+
+    // Authentication
+            if (WebSecurity.IsAuthenticated)
+    {
+        Response.Redirect("~/Beheer.cshtml");
+    }
+
+    // Validation
+    Validation.RequireFields("username", "password");
+
+    // POST login request
+    if (IsPost)
+    {
+        if (Validation.IsValid())
+        {
+            var username = Request.Form["username"];
+            var password = Request.Form["password"];
+
+            if (WebSecurity.Login(username, password))
+            {
+                Response.Redirect("~/Beheer.cshtml");
+            }
+            else
+            {
+                Validation.AddFormError("Combinatie gebruikersnaam/wachtwoord onbekend");
+            }
+        }
+    }
+}
+<h2>Beheer Login</h2>
+<div>
+    @Html.ValidationSummary()
+    <form method="post">
+        <p>
+            <label for="username">Gebruikersnaam:</label>
+            <input type="text" name="username" value="@Request.Form["username"]" required />
+            @Html.ValidationMessage("username")
+        </p>
+
+        <p>
+            <label for="password">Wachtwoord:</label>
+            <input type="password" name="password" required />
+            @Html.ValidationMessage("password")
+        </p>
+
+        <p>
+            <input type="submit" value="Inloggen" />
+        </p>
+    </form>
+</div>
