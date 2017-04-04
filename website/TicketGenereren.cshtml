@@ -62,16 +62,11 @@
         // Print artist name as ticket title
         var paragraph1 = new Paragraph(artiest, titleFont);
         paragraph1.Alignment = 1;
-
         doc.Add(paragraph1);
 
         // Horizontal line
         var line = new Paragraph("______________________", titleFont);
         line.Alignment = Element.ALIGN_CENTER;
-        doc.Add(line);
-
-        // NEW LINE
-        doc.Add(new Chunk("\n"));
 
         //Generate QR Code
         QRCodeGenerator qrGenerator = new QRCodeGenerator();
@@ -79,17 +74,14 @@
         QRCode qrCode = new QRCode(qrCodeData);
         System.Drawing.Image qrCodeImage = qrCode.GetGraphic(5);
 
-        // Insert QR Code
+        // prepare QR Code
         Image jpg = Image.GetInstance(qrCodeImage, BaseColor.WHITE);
-        jpg.Alignment = Image.TEXTWRAP | Image.ALIGN_LEFT;
-        doc.Add(jpg);
+        //jpg.Alignment = Image.TEXTWRAP | Image.ALIGN_LEFT;
 
-        // Insert rest of ticket info
+        // prepare rest of ticket info
         var datump = new Paragraph(@"Datum: " + datum.ToString("dd MMMM, yyyy"), parFont);
-        doc.Add(datump);
 
         var zaalp = new Paragraph("Zaal: " + zaal.ToString(), parFont);
-        doc.Add(zaalp);
 
         //Checken op korting
         var statement4 = "SELECT kindOf65plus FROM Tickets WHERE id = @0";
@@ -98,14 +90,12 @@
         if (korting == false)
         {
             var prijsp = new Paragraph("Prijs: €" + prijs.ToString(), parFont);
-            doc.Add(prijsp);
         }
 
         if (korting == true)
         {
             decimal prijsMetKorting = prijs * 0.9m;
-            var prijsq = new Paragraph("Prijs: €" + prijsMetKorting.ToString(), parFont);
-            doc.Add(prijsq);
+            var prijsp = new Paragraph("Prijs: €" + prijsMetKorting.ToString(), parFont);
         }
 
         // Add artist photo
@@ -113,9 +103,21 @@
         {
             Image artist = Image.GetInstance(foto);
             artist.ScaleToFit(250f, 250f);
-            artist.Alignment = Image.TEXTWRAP | Image.ALIGN_RIGHT;
-            doc.Add(artist);
+            //artist.Alignment = Image.TEXTWRAP | Image.ALIGN_RIGHT;
         }
+
+
+        //Add info in pfdtable
+        PdfPTable table = new PdfPTable(3);
+        table.setWidthPercentage(100);
+        table.addCell(getCell(jpg, PdfPCell.ALIGN_LEFT));
+        table.addCell(getCell(datump + " " + prijsp + " " + zaalp, PdfPCell.ALIGN_CENTER));
+        if (foto != null)
+        {
+            table.addCell(getCell(artist, PdfPCell.ALIGN_RIGHT));   
+        }
+
+        doc.Add(table);
 
         // TicketID for QR url ophogen
         ticketID += 1;//steeds met 1 verhoogd per ticket zodat je het juiste ticketID krijgt, kan misschien wel simpeler gemaakt worden
