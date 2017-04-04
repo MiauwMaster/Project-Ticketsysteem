@@ -1,0 +1,117 @@
+﻿@{
+    Page.Title = "Beheer";
+    Layout = "_SiteLayout.cshtml";
+
+    // Authentication
+    if (!WebSecurity.IsAuthenticated)
+    {
+        Response.Redirect("~/BeheerLogin.cshtml");
+    }
+
+    // Open database connection
+    var db = Database.Open("Database");
+
+    // Variables
+    var concertId = 0;
+    var name = "";
+    var artist = "";
+    var description = "";
+    var price = Decimal.One;
+    var date = DateTime.Now;
+    var photo = "";
+    var video = "";
+    var useVideo = false;
+    var videoID = "";
+
+    // GET request
+    if (!IsPost)
+    {
+        if (!Request.QueryString["id"].IsEmpty() && Request.QueryString["id"].IsInt())
+        {
+            concertId = Convert.ToInt32(Request.QueryString["id"]);
+
+            var statement = "SELECT * FROM Concerten WHERE id = @0";
+            var row = db.QuerySingle(statement, concertId);
+
+            if (row != null)
+            {
+                name = row.naam;
+                artist = row.artiest;
+                description = row.beschrijving;
+                price = row.prijs;
+                date = row.datum;
+            }
+            else
+            {
+                Validation.AddFormError("Geen concert geselecteerd.");
+            }
+        }
+        else
+        {
+            Validation.AddFormError("Geen concert geselecteerd.");
+        }
+    }
+
+    // POST request
+    if (IsPost)
+    {
+        // Validation
+        Validation.RequireFields("concertId", "name", "description", "price", "date"); // more
+
+        if (Validation.IsValid())
+        {
+            // POST values
+            name = Request.Form["name"];
+            artist = Request.Form["artist"];
+            description = Request.Form["description"];
+            price = Convert.ToDecimal(Request.Form["price"]);
+            date = Convert.ToDateTime(Request.Form["date"]);
+
+            var statement = "UPDATE Concerten SET naam = @0, artiest = @1, beschrijving = @2, zaal_nr = @3, prijs = @4, datum = @5";
+            //db.Execute();
+
+            Response.Redirect("~/Beheer.cshtml");
+        }
+    }
+}
+<h2>Concert wijzigen</h2>
+@Html.ValidationSummary()
+<form method="post">
+    <fieldset>
+        <legend>Concert Informatie</legend>
+
+        <p>
+            <label for="name">Concert naam:</label>
+            <input type="text" name="name" value="@name" />
+        </p>
+
+        <p>
+            <label for="artist">Artiest:</label>
+            <input type="text" name="artist" value="@artist" />
+        </p>
+
+        <p>
+            <label for="description">Beschrijving:</label>
+            <textarea name="description">@description</textarea>
+        </p>
+
+        <p>
+            <label for="price">Prijs:</label>
+            <input type="number" name="price" value="@price" />
+        </p>
+
+        <p>
+            <label for="date">Datum:</label>
+            <input type="datetime-local" name="date" value="@date" />
+        </p>
+
+        <input type="hidden" name="concertId" value="@concertId" />
+
+        <p>
+            <input type="submit" value="Wijzig Concert" />
+        </p>
+    </fieldset>
+</form>
+<p>
+    <a href="~/Beheer.cshtml">Terug beheer</a>
+</p>
