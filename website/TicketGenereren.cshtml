@@ -67,6 +67,9 @@
         line.Alignment = Element.ALIGN_CENTER;
         doc.Add(line);
 
+        // NEW LINE
+        doc.Add(new Chunk("\n"));
+
         //Generate QR Code
         QRCodeGenerator qrGenerator = new QRCodeGenerator();
         QRCodeData qrCodeData = qrGenerator.CreateQrCode("TODO: URL invoegen" + ticketID, QRCodeGenerator.ECCLevel.Q);
