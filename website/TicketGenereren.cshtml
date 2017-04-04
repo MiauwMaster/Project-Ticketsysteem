@@ -31,12 +31,9 @@
     var data3 = db.QuerySingle(statement3, bestelNR);
 
 
-
-
     //Fill variables
     artiest = data.naam;
-    foto += Server.MapPath("~");
-    foto += data.foto;
+    foto = data.foto;
     datum = data.datum;
     zaal = data.zaal_nr;
     prijs = data.prijs;
@@ -54,14 +51,14 @@
     var titleFont = FontFactory.GetFont("Verdana", 40, BaseColor.BLACK);
     var parFont = FontFactory.GetFont("Verdana", 15, BaseColor.BLACK);
 
-    for (int i = 0; i < aantalTicketsInBestelling; i++)
+    for (int i = 0; i <= aantalTicketsInBestelling; i++)
     {
         // Create new page for each ticket
         doc.NewPage();
 
         // Print artist name as ticket title
         var paragraph1 = new Paragraph(artiest, titleFont);
-        paragraph1.Alignment = 1;
+        paragraph1.Alignment = Element.ALIGN_CENTER;
 
         doc.Add(paragraph1);
 
@@ -81,7 +78,7 @@
 
         // Insert QR Code
         Image jpg = Image.GetInstance(qrCodeImage, BaseColor.WHITE);
-        jpg.Alignment = Image.TEXTWRAP | Image.ALIGN_LEFT;
+        artist.Alignment = Image.TEXTWRAP | Image.ALIGN_LEFT;
         doc.Add(jpg);
 
         // Insert rest of ticket info
@@ -91,22 +88,8 @@
         var zaalp = new Paragraph("Zaal: " + zaal.ToString(), parFont);
         doc.Add(zaalp);
 
-        //Checken op korting
-        var statement4 = "SELECT kindOf65plus FROM Tickets WHERE id = @0";
-        var korting = db.QueryValue(statement4, ticketID);
-
-        if (korting == false)
-        {
-            var prijsp = new Paragraph("Prijs: €" + prijs.ToString(), parFont);
-            doc.Add(prijsp);
-        }
-
-        if (korting == true)
-        {
-            decimal prijsMetKorting = prijs * 0.9m;
-            var prijsq = new Paragraph("Prijs: €" + prijsMetKorting.ToString(), parFont);
-            doc.Add(prijsq);
-        }
+        var prijsp = new Paragraph("Prijs: €" + prijs.ToString(), parFont);
+        doc.Add(prijsp);
 
         // Add artist photo
         if (foto != null)
@@ -122,15 +105,7 @@
     }
 
     doc.Close();
-
-    Response.Clear();
-
-    string filePath = Server.MapPath("Tickets") + "//" + bestelNR.ToString() + ".pdf";
-
-    Response.ContentType = "application/pdf";
-
-    Response.WriteFile(filePath);
 }
-@data.foto
+@data
 
 
