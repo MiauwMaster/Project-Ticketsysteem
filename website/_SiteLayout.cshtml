@@ -35,7 +35,7 @@
                     </li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a class="nav-link" href="#">Winkelmand</a></li>
+                    <li><a class="nav-link" href="~/Winkelwagen.cshtml">Winkelmand</a></li>
                 </ul>
                 <form class="form-inline my-2 my-lg-0">
                     <input class="form-control mr-sm-2" type="text" placeholder="Zoekterm">
@@ -44,7 +44,7 @@
             </div>
         </nav>
     </header>
-    <div id="body">
+    <div>
         @RenderSection("featured", required: false)
         <section class="clear-fix">
             @RenderBody()

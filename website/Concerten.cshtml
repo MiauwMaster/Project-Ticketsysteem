@@ -10,8 +10,8 @@
     var statement = "SELECT * FROM Concerten WHERE datum > @0 ORDER BY datum ASC";
     var selectedData = db.Query(statement, DateTime.Now);
 }
-<div class="container">
-    <h2>Aankomende concerten</h2>
+<div id="body" class="container">
+    <h2 class="toptext">Aankomende concerten</h2>
         <div class="agenda">
             <div class="table-responsive">
                 <table class="table table-condensed table-bordered">

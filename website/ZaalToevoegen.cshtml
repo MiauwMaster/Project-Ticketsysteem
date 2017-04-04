@@ -34,7 +34,7 @@
     var grid = new WebGrid(source: selectedData, defaultSort: "zaal_nr");
     grid.SortDirection = SortDirection.Ascending;
 }
-<div class="container">
+<div id="body" class="container">
     <h2>Zaal toevoegen</h2>
     @Html.ValidationSummary()
     <form method="post">

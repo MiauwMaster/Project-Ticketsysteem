@@ -4,6 +4,7 @@
 
     // Open database connection
     var db = Database.Open("Database");
+    System.Globalization.CultureInfo ci = new System.Globalization.CultureInfo("nl-NL");
 
     // Variables
     var concertId = 0;
@@ -112,8 +113,8 @@
         }
     }
 }
-<div class="container">
-    <h2>Ticket Bestellen</h2>
+<div id="body" class="container">
+    <h2 class="toptext">Ticket Bestellen</h2>
     @Html.ValidationSummary()
     <div class="row">
         <div class="col-md-6" id="optreden">
@@ -123,21 +124,18 @@
 
             @if (useVideo)
             {
-                <p>
-                    <iframe id="ytplayer" type="text/html"
-                            src="https://www.youtube.com/embed/@videoID?autoplay=0"
-                            frameborder="0"></iframe>
-                </p>
+                <div class="intrinsic-container">
+                    <iframe id="ytplayer" type="text/html" src="https://www.youtube.com/embed/@videoID?autoplay=0" allowfullscreen frameborder="0"></iframe>
+                </div>
             }
 
             <h1 class="wie">@name</h1>
             <p class="ondertekst"><b>Met:</b> @artist</p>
             <p class="ondertekst"><b>Prijs:</b> &euro;@price</p>
-            <p class="ondertekst"><b>Wanneer:</b> @date</p>
+            <p class="ondertekst"><b>Wanneer:</b> @date.ToString("dddd", ci) @date.Day @date.ToString("MMMM", ci) @date.Year</p>
 
-            <p>@description</p>
+            <p id="beschrijving">@description</p>
 
-            <input type="hidden" name="concertId" value="@concertId" />
         </div>
         <div class="col-md-6" id="optreden">
             <form method="post">
@@ -160,6 +158,8 @@
                         <input type="number" name="numberOfDiscountTickets" min="0" value="@Request.Form["numberOfDiscountTickets"]" required />
                         @Html.ValidationMessage("numberOfDiscountTickets")
                     </p>
+
+                    <input type="hidden" name="concertId" value="@concertId" />
 
                     <p>
                         <input type="submit" value="Tickets toevoegen" />
