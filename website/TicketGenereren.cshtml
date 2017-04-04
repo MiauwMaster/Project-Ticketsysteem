@@ -41,7 +41,7 @@
     ticketID = data3.id;
 
 
-    Document doc = new Document(PageSize.A4, 25, 25, 30, 30);
+    Document doc = new Document(PageSize.A4.Rotate(), 25, 25, 30, 30);
 
 
     PdfWriter writer = PdfWriter.GetInstance(doc, new FileStream(Server.MapPath("Tickets") + "\\" + bestelNR + ".pdf", FileMode.Create));
@@ -79,7 +79,7 @@
         doc.Add(jpg);
 
         // Insert rest of ticket info
-        var datump = new Paragraph("Datum: " + datum.ToString("dd MMMM, yyyy"), parFont);
+        var datump = new Paragraph(@"Datum: " + datum.ToString("dd MMMM, yyyy"), parFont);
         doc.Add(datump);
 
         var zaalp = new Paragraph("Zaal: " + zaal.ToString(), parFont);
