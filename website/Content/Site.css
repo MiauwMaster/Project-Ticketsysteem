@@ -1,8 +1,9 @@
 ﻿/*_____AGENDA_____*/
 
-.agenda {  
+.agenda {
     max-width: 60em;
     margin: auto;
+    clear: both;
 }
 
 .agenda .agenda-date, 
@@ -30,7 +31,7 @@
 .agenda .agenda-events .agenda-event {  }*/
 
 
-/*_____AGENDA_____*/
+/*_____WINKELWAGEN____*/
 
 .winkelwagen {
     max-width: 40em;
@@ -45,9 +46,7 @@
 }
 
 html, body {
-    background: url(../Images/andywarhol-soup.jpg) center center fixed;
-    background-size: 10em;
-    clear: both;
+    background-color: maroon;
 }
 
 #body {
@@ -62,6 +61,16 @@ html, body {
     text-align: center;
 }
 
+#background {
+    background-color: maroon;
+}
+
+/*_____OVER_____*/
+#map {
+    height: 400px;
+    width: 100%;
+}
+
 
 /*_____BESTEL INFO_____*/
 img {
@@ -69,18 +78,19 @@ img {
     height: auto;
 }
 
-#optreden {
-    height: auto;
-    border: 0.1rem solid #f7f7f7;
-}
-
 .ondertekst{
     font-style: italic;
     line-height: 0.8em;
+    font-size: 1.5em;
 }
 
 #beschrijving {
     text-align: justify;
+}
+
+.wie {
+    text-align: center;
+    padding-bottom: 0.3em;
 }
 
 .intrinsic-container {
@@ -124,7 +134,7 @@ label {
     font-weight: 600;
 }
 
-label.checkbox {
+.checkbox {
     display: inline;
 }
 

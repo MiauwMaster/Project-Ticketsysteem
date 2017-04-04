@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ﻿@{
     Page.Title = "Ticket Bestellen";
     Layout = "~/_SiteLayout.cshtml";
@@ -85,9 +84,12 @@
             var statementBestelling = "INSERT INTO Bestellingen (email) VALUES (@0)";
             db.Execute(statementBestelling, email);
             var bestelNr = Convert.ToInt32(db.QueryValue("SELECT @@IDENTITY")); // @@IDENTITY retrieves last auto generated id (auto_incremented) of this (current) connection
+                                                                                //Opslaan van variables in sessions zodat ze kunnen worden gebruikt in het ticket
+            Session["bestelnummer"] = bestelNr;
+            Session["concertid"] = concertId;
 
             // SQL statement for ticket insertion
-            //var statementTicket = "INSERT INTO Tickets (kindOf65plus, concertId, bestel_nr) VALUES (@0, @1, @2)";
+            var statementTicket = "INSERT INTO Tickets (kindOf65plus, concertId, bestel_nr) VALUES (@0, @1, @2)";
 
             // TODO: Dit moet pas na de betaling gebeuren!!!
             // Add regular tickets to cart
@@ -95,7 +97,7 @@
             {
                 Ticket ticket = new Ticket(concertId, bestelNr, false);
                 cart.Add(ticket);
-                //db.Execute(statementTicket, 0, concertId, bestelNr);
+                db.Execute(statementTicket, 0, concertId, bestelNr);
             }
 
             // Add discount tickets to cart
@@ -103,40 +105,40 @@
             {
                 Ticket ticket = new Ticket(concertId, bestelNr, true);
                 cart.Add(ticket);
-                //db.Execute(statementTicket, 1, concertId, bestelNr);
+                db.Execute(statementTicket, 1, concertId, bestelNr);
             }
+
+
 
             // Store list of tickets in cart
             Session["cart"] = cart; // var cart = (List<Ticket>)Session["cart"]; om terug te casten naar een Ticket List
 
             // Redirect to cart
-            Response.Redirect("~/Winkelwagen.cshtml");
+            Response.Redirect("~/TicketGenereren.cshtml");
         }
     }
 }
 <div id="body" class="container">
-    <h2 class="toptext">Ticket Bestellen</h2>
+    <h2 class="toptext">@name</h2>
+    <hr />
     @Html.ValidationSummary()
     <div class="row">
         <div class="col-md-6" id="optreden">
-            <p>
-                <img src="@photo" alt="Foto" height="50" widht="50" />
-            </p>
 
+            <p>
+                <img src="@photo" alt="Foto" />
+            </p>
+            <p class="ondertekst"><b>Met:</b> @artist</p>
+            <p class="ondertekst"><b>Prijs:</b> &euro;@price</p>
+            <p class="ondertekst"><b>Wanneer:</b> @date.ToString("dddd", ci) @date.Day @date.ToString("MMMM", ci) @date.Year</p>
+
+            <p id="beschrijving">@description</p>
             @if (useVideo)
             {
                 <div class="intrinsic-container">
                     <iframe id="ytplayer" type="text/html" src="https://www.youtube.com/embed/@videoID?autoplay=0" allowfullscreen frameborder="0"></iframe>
                 </div>
             }
-
-            <h1 class="wie">@name</h1>
-            <p class="ondertekst"><b>Met:</b> @artist</p>
-            <p class="ondertekst"><b>Prijs:</b> &euro;@price</p>
-            <p class="ondertekst"><b>Wanneer:</b> @date.ToString("dddd", ci) @date.Day @date.ToString("MMMM", ci) @date.Year</p>
-
-            <p id="beschrijving">@description</p>
-
         </div>
         <div class="col-md-6" id="optreden">
             <form method="post">
@@ -174,200 +176,3 @@
         </div>
     </div>
 </div>
-=======
-﻿@{
-    Page.Title = "Ticket Bestellen";
-    Layout = "~/_SiteLayout.cshtml";
-
-    // Open database connection
-    var db = Database.Open("Database");
-
-    // Variables
-    var concertId = 0;
-    var name = "";
-    var artist = "";
-    var description = "";
-    var price = Decimal.One;
-    var date = DateTime.Now;
-    var photo = "";
-    var video = "";
-    var useVideo = false;
-    var videoID = "";
-
-    if (!IsPost)
-    {
-        if (!Request.QueryString["id"].IsEmpty() && Request.QueryString["id"].IsInt())
-        {
-            // Concert ID from query string (GET value)
-            concertId = Convert.ToInt32(Request.QueryString["id"]);
-
-            // SQL statement
-            var statement = "SELECT * FROM Concerten WHERE id = @0";
-            var row = db.QuerySingle(statement, concertId);
-
-            if (row != null)
-            {
-                name = row.naam;
-                artist = row.artiest;
-                description = row.beschrijving;
-                price = row.prijs;
-                date = row.datum;
-                photo = row.foto;
-                video = row.video;
-
-                // Validate video URL (because video = optional)
-                try
-                {
-                    // Parse videoID from youtube video URL (for embedding it into iframe)
-                    var youtubeUri = new Uri(video);
-                    var query = HttpUtility.ParseQueryString(youtubeUri.Query);
-                    videoID = query["v"];
-                    useVideo = true;
-                }
-                catch
-                {
-
-                }
-            }
-            else
-            {
-                Validation.AddFormError("Geen concert geselecteerd.");
-            }
-        }
-        else
-        {
-            Validation.AddFormError("Geen concert geselecteerd.");
-        }
-    }
-
-    if (IsPost)
-    {
-        // Validation
-        Validation.RequireFields("concertId", "email", "numberOfTickets", "numberOfDiscountTickets");
-
-        // Read POST form values
-        concertId = Convert.ToInt32(Request.Form["concertId"]);
-        var email = Request.Form["email"];
-        var numberOfTickets = Convert.ToInt32(Request.Form["numberOfTickets"]);
-        var numberOfDiscountTickets = Convert.ToInt32(Request.Form["numberOfDiscountTickets"]);
-
-        if (Validation.IsValid())
-        {
-            // List of current tickets
-            List<Ticket> cart = new List<Ticket>();
-
-            // SQL statement for bestelling insertion
-            var statementBestelling = "INSERT INTO Bestellingen (email) VALUES (@0)";
-            db.Execute(statementBestelling, email);
-            var bestelNr = Convert.ToInt32(db.QueryValue("SELECT @@IDENTITY")); // @@IDENTITY retrieves last auto generated id (auto_incremented) of this (current) connection
-            //Opslaan van variables in sessions zodat ze kunnen worden gebruikt in het ticket
-            Session["bestelnummer"] = bestelNr;
-            Session["concertid"] = concertId;
-
-            // SQL statement for ticket insertion
-            var statementTicket = "INSERT INTO Tickets (kindOf65plus, concertId, bestel_nr) VALUES (@0, @1, @2)";
-
-            // TODO: Dit moet pas na de betaling gebeuren!!!
-            // Add regular tickets to cart
-            for (int i = 0; i < numberOfTickets; i++)
-            {
-                Ticket ticket = new Ticket(concertId, bestelNr, false);
-                cart.Add(ticket);
-                db.Execute(statementTicket, 0, concertId, bestelNr);
-            }
-
-            // Add discount tickets to cart
-            for (int i = 0; i < numberOfDiscountTickets; i++)
-            {
-                Ticket ticket = new Ticket(concertId, bestelNr, true);
-                cart.Add(ticket);
-                db.Execute(statementTicket, 1, concertId, bestelNr);
-            }
-
-
-
-            // Store list of tickets in cart
-            Session["cart"] = cart; // var cart = (List<Ticket>)Session["cart"]; om terug te casten naar een Ticket List
-
-            // Redirect to cart
-            Response.Redirect("~/TicketGenereren.cshtml");
-        }
-    }
-}
-<h2>Ticket Bestellen</h2>
-@Html.ValidationSummary()
-<form method="post">
-    <fieldset>
-        <legend>Ticket Informatie</legend>
-        <p>
-            <img src="@photo" alt="Foto" height="50" widht="50" />
-        </p>
-
-        @if (useVideo)
-        {
-            <p>
-                <iframe id="ytplayer" type="text/html" width="640" height="360"
-                        src="https://www.youtube.com/embed/@videoID?autoplay=0"
-                        frameborder="0"></iframe>
-            </p>
-        }
-        
-        <p>
-            <label for="name">Concert naam:</label>
-            <input type="text" name="name" value="@name" readonly />
-        </p>
-
-        <p>
-            <label for="artist">Artiest:</label>
-            <input type="text" name="artist" value="@artist" readonly />
-        </p>
-
-        <p>
-            <label for="description">Beschrijving:</label>
-            <textarea name="description" rows="4" cols="50" readonly>@description</textarea>
-        </p>
-
-        <p>
-            <label for="price">Prijs</label>
-            <input type="text" name="price" value="&euro;@price" readonly />
-        </p>
-
-        <p>
-            <label for="date">Datum en tijd:</label>
-            <input type="text" name="date" value="@date" readonly />
-        </p>
-
-        <input type="hidden" name="concertId" value="@concertId" />
-
-    </fieldset>
-
-    <fieldset>
-        <legend>Uw gegevens:</legend>
-        <p>
-            <label for="email">Uw e-mailadres</label>
-            <input type="email" name="email" value="@Request.Form["email"]" required />
-            @Html.ValidationMessage("email")
-        </p>
-
-        <p>
-            <label for="numberOfTickets">Aantal reguliere tickets</label>
-            <input type="number" name="numberOfTickets" min="0" value="@Request.Form["numberOfTickets"]" required />
-            @Html.ValidationMessage("numberOfTickets")
-        </p>
-
-        <p>
-            <label for="numberOfDiscountTickets">Tickets met korting *</label>
-            <input type="number" name="numberOfDiscountTickets" min="0" value="@Request.Form["numberOfDiscountTickets"]" required />
-            @Html.ValidationMessage("numberOfDiscountTickets")
-        </p>
-
-        <p>
-            <input type="submit" value="Tickets toevoegen" />
-        </p>
-
-        <p>
-            * Alleen voor kinderen onder de 16 jaar en 65-plussers
-        </p>
-    </fieldset>
-</form>
->>>>>>> refs/remotes/origin/master
