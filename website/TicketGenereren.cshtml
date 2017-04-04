@@ -30,9 +30,6 @@
     var statement3 = "SELECT id FROM Tickets WHERE bestel_nr = @0";
     var data3 = db.QuerySingle(statement3, bestelNR);
 
-
-
-
     //Fill variables
     artiest = data.naam;
     foto += Server.MapPath("~");
@@ -45,7 +42,6 @@
 
 
     Document doc = new Document(PageSize.A4.Rotate(), 25, 25, 30, 30);
-
 
     PdfWriter writer = PdfWriter.GetInstance(doc, new FileStream(Server.MapPath("Tickets") + "\\" + bestelNR + ".pdf", FileMode.Create));
     doc.Open();
@@ -60,13 +56,14 @@
         doc.NewPage();
 
         // Print artist name as ticket title
-        var paragraph1 = new Paragraph(artiest, titleFont);
+        var title = new Paragraph(artiest, titleFont);
         paragraph1.Alignment = 1;
-        doc.Add(paragraph1);
+        doc.Add(title);
 
         // Horizontal line
         var line = new Paragraph("______________________", titleFont);
         line.Alignment = Element.ALIGN_CENTER;
+        doc.Add(line);
 
         //Generate QR Code
         QRCodeGenerator qrGenerator = new QRCodeGenerator();
@@ -74,14 +71,22 @@
         QRCode qrCode = new QRCode(qrCodeData);
         System.Drawing.Image qrCodeImage = qrCode.GetGraphic(5);
 
-        // prepare QR Code
-        Image jpg = Image.GetInstance(qrCodeImage, BaseColor.WHITE);
-        //jpg.Alignment = Image.TEXTWRAP | Image.ALIGN_LEFT;
+        //New line
+        doc.Add(new Chunk("\n"));
 
-        // prepare rest of ticket info
+        // print QR Code
+        Image jpg = Image.GetInstance(qrCodeImage, BaseColor.WHITE);
+        jpg.Alignment = Image.TEXTWRAP | Image.ALIGN_LEFT;
+        doc.Add(jpg);
+
+        // print rest of ticket info
         var datump = new Paragraph(@"Datum: " + datum.ToString("dd MMMM, yyyy"), parFont);
+        datup.Alignment = Element.ALIGN_CENTER;
+        doc.Add(datump);
 
         var zaalp = new Paragraph("Zaal: " + zaal.ToString(), parFont);
+        zaalp.Alignment = Element.ALIGN_CENTER;
+        doc.Add(zaalp);
 
         //Checken op korting
         var statement4 = "SELECT kindOf65plus FROM Tickets WHERE id = @0";
@@ -92,32 +97,23 @@
             var prijsp = new Paragraph("Prijs: €" + prijs.ToString(), parFont);
         }
 
-        if (korting == true)
+        else if (korting == true)
         {
             decimal prijsMetKorting = prijs * 0.9m;
             var prijsp = new Paragraph("Prijs: €" + prijsMetKorting.ToString(), parFont);
         }
 
+        prijsp.Alignment = Element.ALIGN_CENTER;
+        doc.Add(prijsp);
+        
         // Add artist photo
         if (foto != null)
         {
             Image artist = Image.GetInstance(foto);
             artist.ScaleToFit(250f, 250f);
-            //artist.Alignment = Image.TEXTWRAP | Image.ALIGN_RIGHT;
+            artist.Alignment = Image.TEXTWRAP | Image.ALIGN_RIGHT;
+            doc.Add(artist);
         }
-
-
-        //Add info in pfdtable
-        PdfPTable table = new PdfPTable(3);
-        table.setWidthPercentage(100);
-        table.addCell(getCell(jpg, PdfPCell.ALIGN_LEFT));
-        table.addCell(getCell(datump + " " + prijsp + " " + zaalp, PdfPCell.ALIGN_CENTER));
-        if (foto != null)
-        {
-            table.addCell(getCell(artist, PdfPCell.ALIGN_RIGHT));   
-        }
-
-        doc.Add(table);
 
         // TicketID for QR url ophogen
         ticketID += 1;//steeds met 1 verhoogd per ticket zodat je het juiste ticketID krijgt, kan misschien wel simpeler gemaakt worden
