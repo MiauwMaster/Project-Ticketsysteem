@@ -42,8 +42,12 @@
                 var statement = "INSERT INTO Concerten (naam, artiest, beschrijving, prijs, zaal_nr, datum, foto, video) VALUES (@0, @1, @2, @3, @4, @5, @6, @7)";
                 db.Execute(statement, name, artist, description, price, theater, date, @"\" + imagePath, video);
 
-                // Redirect to coming concerts
-                Response.Redirect("~/Concerten.cshtml");
+                // Redirect to administration page
+                Response.Redirect("~/Beheer.cshtml");
+            }
+            else
+            {
+                Validation.AddFormError("Ongeldige of geen foto toegevoegd.");
             }
         }
     }
