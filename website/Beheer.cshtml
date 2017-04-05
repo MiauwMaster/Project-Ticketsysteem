@@ -1,0 +1,43 @@
+﻿@{
+    Page.Title = "Beheer";
+    Layout = "_SiteLayout.cshtml";
+
+    // Authentication
+    if (!WebSecurity.IsAuthenticated)
+    {
+        Response.Redirect("~/BeheerLogin.cshtml");
+    }
+
+    // Open database connection
+    var db = Database.Open("Database");
+
+    // SQL statement for concerts
+    var statement = "SELECT * FROM Concerten WHERE datum > @0";
+    var data = db.Query(statement, DateTime.Now);
+
+    // Create a table (WebGrid) with coming concerts
+    var grid = new WebGrid(source: data, defaultSort: "Datum");
+    grid.SortDirection = SortDirection.Ascending;
+}
+<h2>Beheer</h2>
+<div>
+    <h3>Aankomende concerten:</h3>
+    @grid.GetHtml(
+        tableStyle: "grid",
+        headerStyle: "head",
+        alternatingRowStyle: "alt",
+        columns: grid.Columns(
+            grid.Column("Naam"),
+            grid.Column("Artiest"),
+            grid.Column("Beschrijving"),
+            grid.Column("Prijs"),
+            grid.Column("Datum"),
+            grid.Column(format: @<a href="~/ConcertWijzigen.cshtml?id=@item.ID">Wijzigen</a>),
+            grid.Column(format: @<a href="~/ConcertVerwijderen.cshtml?id=@item.ID">Verwijderen</a>)
+            )
+        )
+
+    <p>
+        <a href="~/ConcertToevoegen.cshtml">Nieuw concert toevoegen</a>
+    </p>
+</div>

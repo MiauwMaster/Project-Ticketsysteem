@@ -10,6 +10,7 @@
     var statement = "SELECT * FROM Concerten WHERE datum > @0 ORDER BY datum ASC";
     var selectedData = db.Query(statement, DateTime.Now);
 }
+<<<<<<< HEAD
 <div id="body" class="container">
     <h2 class="toptext">Aankomende concerten</h2>
     <hr />
@@ -31,6 +32,24 @@
                         @foreach (var item in selectedData)
                         {
                             DateTime datum = item.Datum;
+=======
+<h2>Aankomende concerten</h2>
+<div>
+    @grid.GetHtml(
+        tableStyle: "grid",
+        headerStyle: "head",
+        alternatingRowStyle: "alt",
+        columns: grid.Columns(
+            grid.Column("Naam"),
+            grid.Column("Artiest"),
+            grid.Column("Beschrijving"),
+            grid.Column("Prijs"),
+            grid.Column("Datum"),
+            grid.Column(format: @<a href="~/TicketBestellen.cshtml?id=@item.ID">Bestel</a>)
+            )
+        )
+</div>
+>>>>>>> refs/remotes/origin/master
 
                             <tr>
                                 <td class="agenda-date active" rowspan="1">
