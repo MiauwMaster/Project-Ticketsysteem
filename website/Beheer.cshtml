@@ -12,8 +12,8 @@
     var db = Database.Open("Database");
 
     // SQL statement for concerts
-    var statement = "SELECT * FROM Concerten WHERE datum > @0";
-    var data = db.Query(statement, DateTime.Now);
+    var statement = "SELECT * FROM Concerten";
+    var data = db.Query(statement);
 
     // Create a table (WebGrid) with coming concerts
     var grid = new WebGrid(source: data, defaultSort: "Datum");
