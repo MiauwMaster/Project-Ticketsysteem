@@ -57,13 +57,13 @@
 
         // Print artist name as ticket title
         var title = new Paragraph(artiest, titleFont);
-        paragraph1.Alignment = 1;
-        doc.Add(title);
+        //title.Alignment = 1;
+        //doc.Add(title);
 
         // Horizontal line
         var line = new Paragraph("______________________", titleFont);
         line.Alignment = Element.ALIGN_CENTER;
-        doc.Add(line);
+        //doc.Add(line);
 
         //Generate QR Code
         QRCodeGenerator qrGenerator = new QRCodeGenerator();
@@ -72,48 +72,71 @@
         System.Drawing.Image qrCodeImage = qrCode.GetGraphic(5);
 
         //New line
-        doc.Add(new Chunk("\n"));
+        //doc.Add(new Chunk("\n"));
 
         // print QR Code
         Image jpg = Image.GetInstance(qrCodeImage, BaseColor.WHITE);
-        jpg.Alignment = Image.TEXTWRAP | Image.ALIGN_LEFT;
-        doc.Add(jpg);
+        //jpg.Alignment = Image.TEXTWRAP | Image.ALIGN_LEFT;
+        //doc.Add(jpg);
 
         // print rest of ticket info
         var datump = new Paragraph(@"Datum: " + datum.ToString("dd MMMM, yyyy"), parFont);
-        datup.Alignment = Element.ALIGN_CENTER;
-        doc.Add(datump);
+        //datup.Alignment = Element.ALIGN_CENTER;
+        //doc.Add(datump);
 
         var zaalp = new Paragraph("Zaal: " + zaal.ToString(), parFont);
-        zaalp.Alignment = Element.ALIGN_CENTER;
-        doc.Add(zaalp);
+        //zaalp.Alignment = Element.ALIGN_CENTER;
+        //doc.Add(zaalp);
 
         //Checken op korting
         var statement4 = "SELECT kindOf65plus FROM Tickets WHERE id = @0";
         var korting = db.QueryValue(statement4, ticketID);
 
+        var prijsp;
         if (korting == false)
         {
             var prijsp = new Paragraph("Prijs: €" + prijs.ToString(), parFont);
+            //prijsp.Alignment = Element.ALIGN_CENTER;
+            //doc.Add(prijsp);
         }
 
         else if (korting == true)
         {
             decimal prijsMetKorting = prijs * 0.9m;
             var prijsp = new Paragraph("Prijs: €" + prijsMetKorting.ToString(), parFont);
+            //prijsp.Alignment = Element.ALIGN_CENTER;
+            //doc.Add(prijsp);
         }
 
-        prijsp.Alignment = Element.ALIGN_CENTER;
-        doc.Add(prijsp);
+        
         
         // Add artist photo
         if (foto != null)
         {
             Image artist = Image.GetInstance(foto);
-            artist.ScaleToFit(250f, 250f);
-            artist.Alignment = Image.TEXTWRAP | Image.ALIGN_RIGHT;
-            doc.Add(artist);
+            artist.ScaleToFit(200f, 200f);
+            //artist.Alignment = Image.TEXTWRAP | Image.ALIGN_RIGHT;
+            //doc.Add(artist);
         }
+
+
+
+        PdfPTable table = new PdfPTable(3);
+        PdfPCell titel = new PdfPCell(artiest);
+        titel.Colspan = 3;
+        titel.HorizontalAlignment = 1;
+        table.AddCell(titel);
+        table.AddCell(jpg);
+        table.AddCell(datump + "\n" + zaalp + "\n" prijsp);
+        table.AddCell(artist);
+
+        doc.Add(table);
+
+
+
+
+
+
 
         // TicketID for QR url ophogen
         ticketID += 1;//steeds met 1 verhoogd per ticket zodat je het juiste ticketID krijgt, kan misschien wel simpeler gemaakt worden
