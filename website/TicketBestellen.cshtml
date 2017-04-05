@@ -71,6 +71,7 @@
         // Read POST form values
         concertId = Convert.ToInt32(Request.Form["concertId"]);
         var email = Request.Form["email"];
+        Session["email"] = email;
         var numberOfTickets = Convert.ToInt32(Request.Form["numberOfTickets"]);
         var numberOfDiscountTickets = Convert.ToInt32(Request.Form["numberOfDiscountTickets"]);
 
