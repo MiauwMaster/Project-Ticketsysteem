@@ -95,7 +95,7 @@
         if (foto != null)
         {
             artist = Image.GetInstance(foto);
-            artist.ScaleToFit(200f, 200f);
+            artist.ScaleToFit(150f, 150f);
         }
 
 
@@ -111,11 +111,12 @@
 
         PdfPCell info = new PdfPCell();
         info.Border = Rectangle.NO_BORDER;
-        info.HorizontalAlignment = 1;
         info.VerticalAlignment = 1;
         info.AddElement(datump);
         info.AddElement(zaalp);
         info.AddElement(prijsp);
+        info.HorizontalAlignment = Element.ALIGN_MIDDLE;
+
 
         table.AddCell(titel);
         table.AddCell(jpg);
