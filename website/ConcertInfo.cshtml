@@ -15,7 +15,8 @@
     var concertId = 0;
     var maxTickets = 0;
     var soldTickets = 0;
-    var availableTIckets = 0;
+    var availableTickets = 0;
+    var earnedMoney = 0m;
 
     // GET request
     if (!IsPost)
@@ -34,7 +35,28 @@
             soldTickets = db.QueryValue("SELECT COUNT(*) FROM Tickets INNER JOIN Bestellingen ON Tickets.bestel_nr = Bestellingen.id WHERE Tickets.concertId = @0 AND Bestellingen.betaald = 1", concertId);
 
             // Number of available tickets
-            availableTIckets = maxTickets - soldTickets;
+            availableTickets = maxTickets - soldTickets;
+
+            // Money earned from sold tickets so far
+            foreach (var ticket in db.Query("SELECT * FROM Tickets WHERE concertId = @0", concertId))
+            {
+                var orderNumber = ticket.bestel_nr;
+                var korting = ticket.kindOf65plus;
+                var price = db.QueryValue("SELECT prijs FROM Concerten WHERE id = @0", concertId);
+
+                // If order (where current ticket is part of) is paid
+                if (db.QueryValue("SELECT betaald FROM Bestellingen WHERE id = @0", orderNumber) == true)
+                {
+                    if (korting)
+                    {
+                        earnedMoney += (price / 100) * 90;
+                    }
+                    else
+                    {
+                        earnedMoney += price;
+                    }
+                }
+            }
         }
         else
         {
@@ -55,6 +77,13 @@
     </p>
     <p>
         <h3>Beschikbare tickets:</h3>
-        @availableTIckets
+        @availableTickets
+    </p>
+    <p>
+        <h3>Totaal verdient:</h3>
+        @earnedMoney
+    </p>
+    <p>
+        <a href="~/Beheer.cshtml">Terug naar beheer</a>
     </p>
 </div>
