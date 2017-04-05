@@ -104,10 +104,13 @@
         PdfPCell titel = new PdfPCell(title);
         titel.Colspan = 3;
         titel.Border = Rectangle.NO_BORDER;
+        titel.FixedHeight = 50f
         titel.HorizontalAlignment = 1;
 
         PdfPCell info = new PdfPCell();
         info.Border = Rectangle.NO_BORDER;
+        info.HorizontalAlignment = 1;
+        info.VerticalAlignment = 1;
         info.AddElement(datump);
         info.AddElement(zaalp);
         info.AddElement(prijsp);
