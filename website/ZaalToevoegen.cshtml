@@ -2,12 +2,6 @@
     Page.Title = "Zaal Toevoegen";
     Layout = "_SiteLayout.cshtml"; // Dit is de standaard SiteLayout.cshtml, deze moeten we zelf aanpassen naar onze wensen
 
-    // Authentication
-    if(!WebSecurity.IsAuthenticated)
-    {
-        Response.Redirect("~/BeheerLogin.cshtml");
-    }
-
     // Open database connection
     var db = Database.Open("Database");
 

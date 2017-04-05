@@ -120,52 +120,76 @@
 }
 <div id="body" class="container">
     <h2 class="toptext">@name</h2>
+    <p class="ondertekst"><b>Met:</b> @artist &#9;&#9;<b>Prijs:</b> &euro;@price &#9;&#9; <b>Wanneer:</b> @date.ToString("dddd", ci) @date.Day @date.ToString("MMMM", ci) @date.Year</p>
     <hr />
     @Html.ValidationSummary()
     <div class="row">
         <div class="col-md-6" id="optreden">
-
             <p>
                 <img src="@photo" alt="Foto" />
             </p>
-            <p class="ondertekst"><b>Met:</b> @artist</p>
-            <p class="ondertekst"><b>Prijs:</b> &euro;@price</p>
-            <p class="ondertekst"><b>Wanneer:</b> @date.ToString("dddd", ci) @date.Day @date.ToString("MMMM", ci) @date.Year</p>
-
-            <p id="beschrijving">@description</p>
-            @if (useVideo)
-            {
-                <div class="intrinsic-container">
-                    <iframe id="ytplayer" type="text/html" src="https://www.youtube.com/embed/@videoID?autoplay=0" allowfullscreen frameborder="0"></iframe>
+            <button class="btn btn-primary" style="width:100%" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                Meer informatie
+            </button>
+            <div class="collapse" id="collapseExample">
+                <div class="card card-block">
+                    <p id="beschrijving">@description</p>
+                    @if (useVideo)
+                    {
+                        <div class="intrinsic-container">
+                            <iframe id="ytplayer" type="text/html" src="https://www.youtube.com/embed/@videoID?autoplay=0" allowfullscreen frameborder="0"></iframe>
+                        </div>
+                    }
                 </div>
-            }
+            </div>
         </div>
         <div class="col-md-6" id="optreden">
+            @*<p class="ondertekst"><b>Met:</b> @artist</p>
+            <p class="ondertekst"><b>Prijs:</b> &euro;@price</p>
+            <p class="ondertekst"><b>Wanneer:</b> @date.ToString("dddd", ci) @date.Day @date.ToString("MMMM", ci) @date.Year</p>*@
+            <h2 class="toptext">Tickets kopen</h2>
+            <hr />
             <form method="post">
                 <fieldset>
                     <legend>Uw gegevens:</legend>
                     <p>
                         <label for="email">Uw e-mailadres</label>
-                        <input type="email" name="email" value="@Request.Form["email"]" required />
+                        <input type="email" class="form-control" name="email" value="@Request.Form["email"]" required />
                         @Html.ValidationMessage("email")
                     </p>
 
                     <p>
                         <label for="numberOfTickets">Aantal reguliere tickets</label>
-                        <input type="number" name="numberOfTickets" min="0" value="@Request.Form["numberOfTickets"]" required />
+                        <div class="input-group">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default value-control" data-action="minus" data-target="regtick">-</button>
+                            </span>
+                            <input name="numberOfTickets" type="number" class="form-control no-padding add-color text-center height-25" id="regtick" maxlength="3" value="0" required>
+                            <span class="input-group-btn">
+                                <button class="btn btn-default value-control" data-action="plus" data-target="regtick">+</button>
+                            </span>
+                        </div>
                         @Html.ValidationMessage("numberOfTickets")
                     </p>
 
                     <p>
-                        <label for="numberOfDiscountTickets">Tickets met korting *</label>
-                        <input type="number" name="numberOfDiscountTickets" min="0" value="@Request.Form["numberOfDiscountTickets"]" required />
+                        <label for="numberOfDiscountTickets">Tickets met korting*</label>
+                        <div class="input-group">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default value-control" data-action="minus" data-target="distick">-</button>
+                            </span>
+                            <input name="numberOfDiscountTickets" type="number" class="form-control no-padding add-color text-center height-25" id="distick" maxlength="3" value="0" required>
+                            <span class="input-group-btn">
+                                <button class="btn btn-default value-control" data-action="plus" data-target="distick">+</button>
+                            </span>
+                        </div>
                         @Html.ValidationMessage("numberOfDiscountTickets")
                     </p>
 
                     <input type="hidden" name="concertId" value="@concertId" />
 
                     <p>
-                        <input type="submit" value="Tickets toevoegen" />
+                        <input type="submit" class="btn btn-primary" value="Tickets toevoegen" />
                     </p>
 
                     <p>

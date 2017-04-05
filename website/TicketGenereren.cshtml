@@ -30,10 +30,10 @@
     var statement3 = "SELECT id FROM Tickets WHERE bestel_nr = @0";
     var data3 = db.QuerySingle(statement3, bestelNR);
 
+
     //Fill variables
     artiest = data.naam;
-    foto += Server.MapPath("~");
-    foto += data.foto;
+    foto = data.foto;
     datum = data.datum;
     zaal = data.zaal_nr;
     prijs = data.prijs;
@@ -41,7 +41,8 @@
     ticketID = data3.id;
 
 
-    Document doc = new Document(PageSize.A4.Rotate(), 25, 25, 30, 30);
+    Document doc = new Document(PageSize.A4, 25, 25, 30, 30);
+
 
     PdfWriter writer = PdfWriter.GetInstance(doc, new FileStream(Server.MapPath("Tickets") + "\\" + bestelNR + ".pdf", FileMode.Create));
     doc.Open();
@@ -50,15 +51,19 @@
     var titleFont = FontFactory.GetFont("Verdana", 40, BaseColor.BLACK);
     var parFont = FontFactory.GetFont("Verdana", 15, BaseColor.BLACK);
 
-    for (int i = 0; i < aantalTicketsInBestelling; i++)
+    for (int i = 0; i <= aantalTicketsInBestelling; i++)
     {
+        // TicketID for QR url
+        ticketID += 1;//steeds met 1 verhoogd per ticket zodat je het juiste ticketID krijgt, kan misschien wel simpeler gemaakt worden
+       
         // Create new page for each ticket
         doc.NewPage();
 
         // Print artist name as ticket title
-        var title = new Paragraph(artiest, titleFont);
-        paragraph1.Alignment = 1;
-        doc.Add(title);
+        var paragraph1 = new Paragraph(artiest, titleFont);
+        paragraph1.Alignment = Element.ALIGN_CENTER;
+
+        doc.Add(paragraph1);
 
         // Horizontal line
         var line = new Paragraph("______________________", titleFont);
@@ -71,64 +76,30 @@
         QRCode qrCode = new QRCode(qrCodeData);
         System.Drawing.Image qrCodeImage = qrCode.GetGraphic(5);
 
-        //New line
-        doc.Add(new Chunk("\n"));
-
-        // print QR Code
+        // Insert QR Code
         Image jpg = Image.GetInstance(qrCodeImage, BaseColor.WHITE);
-        jpg.Alignment = Image.TEXTWRAP | Image.ALIGN_LEFT;
         doc.Add(jpg);
 
-        // print rest of ticket info
-        var datump = new Paragraph(@"Datum: " + datum.ToString("dd MMMM, yyyy"), parFont);
-        datup.Alignment = Element.ALIGN_CENTER;
+        // Insert rest of ticket info
+        var datump = new Paragraph("Datum: " + datum.ToString("dd MMMM, yyyy"), parFont);
         doc.Add(datump);
 
         var zaalp = new Paragraph("Zaal: " + zaal.ToString(), parFont);
-        zaalp.Alignment = Element.ALIGN_CENTER;
         doc.Add(zaalp);
 
-        //Checken op korting
-        var statement4 = "SELECT kindOf65plus FROM Tickets WHERE id = @0";
-        var korting = db.QueryValue(statement4, ticketID);
-
-        if (korting == false)
-        {
-            var prijsp = new Paragraph("Prijs: €" + prijs.ToString(), parFont);
-        }
-
-        else if (korting == true)
-        {
-            decimal prijsMetKorting = prijs * 0.9m;
-            var prijsp = new Paragraph("Prijs: €" + prijsMetKorting.ToString(), parFont);
-        }
-
-        prijsp.Alignment = Element.ALIGN_CENTER;
+        var prijsp = new Paragraph("Prijs: €" + prijs.ToString(), parFont);
         doc.Add(prijsp);
-        
+
         // Add artist photo
         if (foto != null)
         {
             Image artist = Image.GetInstance(foto);
-            artist.ScaleToFit(250f, 250f);
-            artist.Alignment = Image.TEXTWRAP | Image.ALIGN_RIGHT;
             doc.Add(artist);
         }
-
-        // TicketID for QR url ophogen
-        ticketID += 1;//steeds met 1 verhoogd per ticket zodat je het juiste ticketID krijgt, kan misschien wel simpeler gemaakt worden
     }
 
     doc.Close();
-
-    Response.Clear();
-
-    string filePath = Server.MapPath("Tickets") + "//" + bestelNR.ToString() + ".pdf";
-
-    Response.ContentType = "application/pdf";
-
-    Response.WriteFile(filePath);
 }
-@data.foto
+@data
 
 

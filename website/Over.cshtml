@@ -17,13 +17,7 @@
     <div class="row">
         <div class="col-md-6">
             <script src='https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyDkdb_b2lzSsZ7NiRgF3bNYtWiMWsg3CcA'></script><div style='overflow:hidden;height:500px;width:500px;'>
-                <div id='gmap_canvas' style='height:500px;width:100%;'></div>
-                <style>
-                    #gmap_canvas img {
-                        max-width: none !important;
-                        background: none !important
-                    }
-                </style>
+                <div id='gmap_canvas'></div>
             </div> <a href='http://maps-generator.com/nl'>http://maps-generator.com</a>
             <script type='text/javascript' src='https://embedmaps.com/google-maps-authorization/script.js?id=3c033649f1e30bb8686f657f1487e450bebf8aa2'></script>
             <script type='text/javascript'>function init_map() { var myOptions = { zoom: 13, center: new google.maps.LatLng(53.2120896, 5.799470799999995), mapTypeId: google.maps.MapTypeId.ROADMAP }; map = new google.maps.Map(document.getElementById('gmap_canvas'), myOptions); marker = new google.maps.Marker({ map: map, position: new google.maps.LatLng(53.2120896, 5.799470799999995) }); infowindow = new google.maps.InfoWindow({ content: '<strong>NHL</strong><br>Rengerslaan 10<br>8917 DD  Leeuwarden<br>' }); google.maps.event.addListener(marker, 'click', function () { infowindow.open(map, marker); }); infowindow.open(map, marker); } google.maps.event.addDomListener(window, 'load', init_map);</script>
