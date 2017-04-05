@@ -56,7 +56,7 @@
         doc.NewPage();
 
         // Print artist name as ticket title
-        var title = new phrase(artiest, titleFont);
+        var title = new Phrase(artiest, titleFont);
 
         //Generate QR Code
         QRCodeGenerator qrGenerator = new QRCodeGenerator();
@@ -68,31 +68,31 @@
         Image jpg = Image.GetInstance(qrCodeImage, BaseColor.WHITE);
 
         // print rest of ticket info
-        var datump = new Phrase(@"Datum: " + datum.ToString("dd MMMM, yyyy"), parFont));
-        var zaalp = new Phrase("Zaal: " + zaal.ToString(), parFont));
+        var datump = new Phrase(@"Datum: " + datum.ToString("dd MMMM, yyyy"), parFont);
+        var zaalp = new Phrase("Zaal: " + zaal.ToString(), parFont);
 
 
         //Checken op korting
         var statement4 = "SELECT kindOf65plus FROM Tickets WHERE id = @0";
         var korting = db.QueryValue(statement4, ticketID);
 
-        Phrase prijsp = "";
+        Phrase prijsp = new Phrase();
         if (korting == false)
         {
-            var prijsp = new Phrase("Prijs: €" + prijs.ToString(), parFont));
+            prijsp = new Phrase("Prijs: €" + prijs.ToString(), parFont);
         }
 
         else if (korting == true)
         {
             decimal prijsMetKorting = prijs * 0.9m;
-            var prijsp = new Phrase("Prijs: €" + prijsMetKorting.ToString(), parFont));
+            prijsp = new Phrase("Prijs: €" + prijsMetKorting.ToString(), parFont);
         }
 
         // Add artist photo
-        image artist = null;
+        Image artist = null;
         if (foto != null)
         {
-            Image artist = Image.GetInstance(foto);
+            artist = Image.GetInstance(foto);
             artist.ScaleToFit(200f, 200f);
         }
 
@@ -101,15 +101,15 @@
         PdfPTable table = new PdfPTable(3);
         table.DefaultCell.Border = Rectangle.NO_BORDER;
 
-        PdfPCell titel = new PdfPCell(title + "\n");
+        PdfPCell titel = new PdfPCell(title);
         titel.Colspan = 3;
         titel.Border = Rectangle.NO_BORDER;
         titel.HorizontalAlignment = 1;
 
         PdfPCell info = new PdfPCell();
         info.Border = Rectangle.NO_BORDER;
-        info.AddElement(datump + "\n");
-        info.AddElement(zaalp + "\n");
+        info.AddElement(datump);
+        info.AddElement(zaalp);
         info.AddElement(prijsp);
         
         table.AddCell(titel);
