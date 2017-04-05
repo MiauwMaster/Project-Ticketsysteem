@@ -32,6 +32,7 @@
             grid.Column("Beschrijving"),
             grid.Column("Prijs"),
             grid.Column("Datum"),
+            grid.Column(format: @<a href="~/ConcertInfo.cshtml?id=@item.ID">Info</a>),
             grid.Column(format: @<a href="~/ConcertWijzigen.cshtml?id=@item.ID">Wijzigen</a>),
             grid.Column(format: @<a href="~/ConcertVerwijderen.cshtml?id=@item.ID">Verwijderen</a>)
             )
