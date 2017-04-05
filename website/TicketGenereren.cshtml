@@ -57,13 +57,6 @@
 
         // Print artist name as ticket title
         var title = new phrase(artiest, titleFont);
-        //title.Alignment = 1;
-        //doc.Add(title);
-
-        // Horizontal line
-        var line = new Paragraph("______________________", titleFont);
-        line.Alignment = Element.ALIGN_CENTER;
-        //doc.Add(line);
 
         //Generate QR Code
         QRCodeGenerator qrGenerator = new QRCodeGenerator();
@@ -71,52 +64,36 @@
         QRCode qrCode = new QRCode(qrCodeData);
         System.Drawing.Image qrCodeImage = qrCode.GetGraphic(5);
 
-        //New line
-        //doc.Add(new Chunk("\n"));
-
         // print QR Code
         Image jpg = Image.GetInstance(qrCodeImage, BaseColor.WHITE);
-        //jpg.Alignment = Image.TEXTWRAP | Image.ALIGN_LEFT;
-        //doc.Add(jpg);
 
         // print rest of ticket info
-        var datump = new PdfPCell(new Phrase(@"Datum: " + datum.ToString("dd MMMM, yyyy"), parFont));
-        //datup.Alignment = Element.ALIGN_CENTER;
-        //doc.Add(datump);
+        var datump = new Phrase(@"Datum: " + datum.ToString("dd MMMM, yyyy"), parFont));
+        var zaalp = new Phrase("Zaal: " + zaal.ToString(), parFont));
 
-        var zaalp = new PdfPCell(new Phrase("Zaal: " + zaal.ToString(), parFont));
-        //zaalp.Alignment = Element.ALIGN_CENTER;
-        //doc.Add(zaalp);
 
         //Checken op korting
         var statement4 = "SELECT kindOf65plus FROM Tickets WHERE id = @0";
         var korting = db.QueryValue(statement4, ticketID);
 
-        paragraph prijsp = "";
+        Phrase prijsp = "";
         if (korting == false)
         {
-            var prijsp = new PdfPCell(new Phrase("Prijs: €" + prijs.ToString(), parFont));
-            //prijsp.Alignment = Element.ALIGN_CENTER;
-            //doc.Add(prijsp);
+            var prijsp = new Phrase("Prijs: €" + prijs.ToString(), parFont));
         }
 
         else if (korting == true)
         {
             decimal prijsMetKorting = prijs * 0.9m;
-            var prijsp = new PdfPCell(new Phrase("Prijs: €" + prijsMetKorting.ToString(), parFont));
-            //prijsp.Alignment = Element.ALIGN_CENTER;
-            //doc.Add(prijsp);
+            var prijsp = new Phrase("Prijs: €" + prijsMetKorting.ToString(), parFont));
         }
 
-        
-        image artist = null;
         // Add artist photo
+        image artist = null;
         if (foto != null)
         {
             Image artist = Image.GetInstance(foto);
             artist.ScaleToFit(200f, 200f);
-            //artist.Alignment = Image.TEXTWRAP | Image.ALIGN_RIGHT;
-            //doc.Add(artist);
         }
 
 
@@ -124,13 +101,20 @@
         PdfPTable table = new PdfPTable(3);
         table.DefaultCell.Border = Rectangle.NO_BORDER;
 
-        PdfPCell titel = new PdfPCell(title);
+        PdfPCell titel = new PdfPCell(title + "\n");
         titel.Colspan = 3;
+        titel.Border = Rectangle.NO_BORDER;
         titel.HorizontalAlignment = 1;
+
+        PdfPCell info = new PdfPCell();
+        info.Border = Rectangle.NO_BORDER;
+        info.AddElement(datump + "\n");
+        info.AddElement(zaalp + "\n");
+        info.AddElement(prijsp);
         
         table.AddCell(titel);
         table.AddCell(jpg);
-        table.AddCell(datump + "\n" + zaalp + "\n" prijsp);
+        table.AddCell(info);
         table.AddCell(artist);
 
         doc.Add(table);
