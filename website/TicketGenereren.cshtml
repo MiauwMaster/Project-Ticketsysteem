@@ -2,10 +2,12 @@
 @using iTextSharp.text;
 @using iTextSharp.text.pdf;
 @using QRCoder;
+@using System.Net.Mail;
 @{
     //Variables
     var artiest = "";
     var foto = "";
+    var userEmail = Session["email"];
     DateTime datum = new DateTime();
     var zaal = 0;
     var prijs = Decimal.One;
@@ -104,7 +106,7 @@
         PdfPCell titel = new PdfPCell(title);
         titel.Colspan = 3;
         titel.Border = Rectangle.NO_BORDER;
-        titel.FixedHeight = 50f
+        titel.FixedHeight = 50f;
         titel.HorizontalAlignment = 1;
 
         PdfPCell info = new PdfPCell();
@@ -114,7 +116,7 @@
         info.AddElement(datump);
         info.AddElement(zaalp);
         info.AddElement(prijsp);
-        
+
         table.AddCell(titel);
         table.AddCell(jpg);
         table.AddCell(info);
@@ -141,6 +143,30 @@
     Response.ContentType = "application/pdf";
 
     Response.WriteFile(filePath);
+
+    try
+    {
+        MailAddress mailfrom = new MailAddress("ticketsysteemnhl@gmail.com");
+        MailAddress mailto = new MailAddress(userEmail.ToString());
+        MailMessage newmsg = new MailMessage(mailfrom, mailto);
+
+        newmsg.Subject = "Uw Ticket(s)";
+        newmsg.Body = "Hartelijk bedankt voor het bestellen van ticket(s) voor het concert: " + artiest + ". " + "In de bijlage vind u een pdf met uw tickets, deze dient u uit te printen en te laten zien bij binnenkomst";
+
+        //For File Attachment, more file can also be attached
+        Attachment att = new Attachment(Server.MapPath("Tickets") + "\\" + bestelNR + ".pdf");
+        newmsg.Attachments.Add(att);
+
+        SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587);
+        smtp.UseDefaultCredentials = false;
+        smtp.Credentials = new NetworkCredential("ticketsysteemnhl@gmail.com", "waltersamplonius");
+        smtp.EnableSsl = true;
+        smtp.Send(newmsg);
+    }
+    catch (Exception ex)
+    {
+        Response.Write(ex.Message);
+    }
 }
 @data.foto
 
