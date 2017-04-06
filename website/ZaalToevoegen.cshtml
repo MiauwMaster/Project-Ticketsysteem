@@ -2,6 +2,12 @@
     Page.Title = "Zaal Toevoegen";
     Layout = "_SiteLayout.cshtml"; // Dit is de standaard SiteLayout.cshtml, deze moeten we zelf aanpassen naar onze wensen
 
+    // Authentication
+    if(!WebSecurity.IsAuthenticated)
+    {
+        Response.Redirect("~/BeheerLogin.cshtml");
+    }
+
     // Open database connection
     var db = Database.Open("Database");
 
@@ -24,47 +30,23 @@
             Response.Redirect("~/ConcertToevoegen.cshtml");
         }
     }
-
-    // Huidige zalen weergeven
-    // SQL statement
-    var statementZalen = "SELECT * FROM Zalen";
-    var selectedData = db.Query(statementZalen);
-
-    // Create a table (WebGrid) with coming concerts
-    var grid = new WebGrid(source: selectedData, defaultSort: "zaal_nr");
-    grid.SortDirection = SortDirection.Ascending;
 }
-<div id="body" class="container">
-    <h2>Zaal toevoegen</h2>
-    @Html.ValidationSummary()
-    <form method="post">
-        <fieldset>
-            <legend>Zaal informatie</legend>
-            <p>
-                <label for="numberOfSpots">Aantal plekken:</label>
-                <input type="number" name="numberOfSpots" min="1" />
-            </p>
+<h2>Zaal toevoegen</h2>
+@Html.ValidationSummary()
+<form method="post">
+    <fieldset>
+        <legend>Zaal informatie</legend>
+        <p>
+            <label for="numberOfSpots">Aantal plekken:</label>
+            <input type="number" name="numberOfSpots" min="1" /> 
+        </p>
 
-            <p>
-                <input type="submit" value="Zaal toevoegen" />
-            </p>
+        <p>
+            <input type="submit" value="Zaal toevoegen" />
+        </p>
 
-            <p>
-                * Een zaalnummer wordt automatisch toegewezen
-            </p>
-        </fieldset>
-    </form>
-
-    <h2>Zalen</h2>
-    <div>
-        @grid.GetHtml(
-        tableStyle: "grid",
-        headerStyle: "head",
-        alternatingRowStyle: "alt",
-        columns: grid.Columns(
-            grid.Column("zaal_nr"),
-            grid.Column("aantal_plekken")
-            )
-        )
-    </div>
-</div>
+        <p>
+            * Een zaalnummer wordt automatisch toegewezen
+        </p>
+    </fieldset>
+</form>
