@@ -11,13 +11,12 @@
     DateTime datum = new DateTime();
     var zaal = 0;
     var prijs = Decimal.One;
-    var aantalTicketsInBestelling = 0;
     int ticketID = 0;
     var concertID = Session["concertid"];
     var bestelNR = Request.QueryString["id"]; // uit vorige pagina halen
 
     // Random for pdf name
-    var rand = new Random().next(1111111,9999999);
+    var rand = new Random().Next(1111111,9999999);
 
     //Get email
 
@@ -77,7 +76,7 @@
         zaal = data2.zaal_nr;
         prijs = data2.prijs;
         ticketID = row.id;
-        
+
 
         // Print artist name as ticket title
         var title = new Phrase(artiest, titleFont);
@@ -122,7 +121,7 @@
 
         PdfPTable table = new PdfPTable(3);
         table.DefaultCell.Border = Rectangle.NO_BORDER;
-        table.DefaultCell.VerticalAlignment = 1;
+        table.DefaultCell.VerticalAlignment = Element.ALIGN_MIDDLE;
 
         PdfPCell titel = new PdfPCell(title);
         titel.Colspan = 3;
@@ -133,7 +132,7 @@
         PdfPCell info = new PdfPCell();
         info.Border = Rectangle.NO_BORDER;
         info.HorizontalAlignment = 1;
-        info.VerticalAlignment = 1;
+        info.VerticalAlignment = Element.ALIGN_MIDDLE;
         info.AddElement(datump);
         info.AddElement(zaalp);
         info.AddElement(prijsp);
@@ -156,7 +155,7 @@
 
     //Generate pdf on page
 
-    string filePath = Server.MapPath("Tickets") + "//" + bestelNR.ToString() + ".pdf";
+    string filePath = Server.MapPath("Tickets") + "//" + bestelNR.ToString() + rand.ToString() + ".pdf";
 
     Response.ContentType = "application/pdf";
 
