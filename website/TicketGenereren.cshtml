@@ -65,16 +65,14 @@
 
         //Get concert van ticket
         var statement2 = "SELECT * FROM Concerten WHERE id = @0";
-        var data2 = db.Query(statement2, row.concertId);
+        var data2 = db.QuerySingle(statement2, row.concertId);
 
         //Fill variables
         artiest = data2.naam;
-        foto += Server.MapPath("~");
-        foto += data2.foto;
+        foto = Server.MapPath("~") + data2.foto;
         datum = data2.datum;
         zaal = data2.zaal_nr;
         prijs = data2.prijs;
-        aantalTicketsInBestelling = data2;
         ticketID = row.id;
 
         // Print artist name as ticket title
