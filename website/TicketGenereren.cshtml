@@ -1,4 +1,3 @@
-
 @using iTextSharp.text;
 @using iTextSharp.text.pdf;
 @using QRCoder;
@@ -7,41 +6,48 @@
     //Variables
     var artiest = "";
     var foto = "";
-    var userEmail = Session["email"];
+    var db = Database.Open("Database");
+
     DateTime datum = new DateTime();
     var zaal = 0;
     var prijs = Decimal.One;
     var aantalTicketsInBestelling = 0;
     int ticketID = 0;
     var concertID = Session["concertid"];
-    int bestelNR = Convert.ToInt32(Session["bestelnummer"]); // uit vorige pagina halen
+    var bestelNR = Request.QueryString["id"]; // uit vorige pagina halen
+
+    //Get email
+
+    var statement5 = "SELECT email FROM Bestellingen WHERE id = @0";
+    var userEmail = db.QueryValue(statement5, bestelNR);
+
+    //Checken of er betaald is
+    var statement1 = "SELECT betaald FROM Bestellingen WHERE email = @0";
+    var data1 = db.QueryValue(statement1, userEmail);
+
+    if (data1 == false)
+    {
+        Response.Redirect("~//Default.cshtml");
+    }
 
     // Open database connection
-    var db = Database.Open("Database");
 
-    // SQL Statement
-    // Concert info
-    var statement = "SELECT * FROM Concerten WHERE id = @0";
-    var data = db.QuerySingle(statement, concertID); // ID FROM LAST PAGE
+    //// SQL Statement
+    //// Concert info
+    //var statement = "SELECT * FROM Concerten WHERE id = @0";
+    //var data = db.QuerySingle(statement, concertID); // ID FROM LAST PAGE
 
-    // Aantal tickets
-    var statement2 = "SELECT COUNT(bestel_nr) FROM Tickets WHERE bestel_nr = @0";
-    var data2 = db.QueryValue(statement2, bestelNR);
+    //// Aantal tickets
+    //var statement2 = "SELECT COUNT(bestel_nr) FROM Tickets WHERE bestel_nr = @0";
+    //var data2 = db.QueryValue(statement2, bestelNR);
 
-    //Eerste ID met bestelnummer
-    var statement3 = "SELECT id FROM Tickets WHERE bestel_nr = @0";
-    var data3 = db.QuerySingle(statement3, bestelNR);
+    ////Eerste ID met bestelnummer
+    //var statement3 = "SELECT id FROM Tickets WHERE bestel_nr = @0";
+    //var data3 = db.QuerySingle(statement3, bestelNR);
 
-    //Fill variables
-    artiest = data.naam;
-    foto += Server.MapPath("~");
-    foto += data.foto;
-    datum = data.datum;
-    zaal = data.zaal_nr;
-    prijs = data.prijs;
-    aantalTicketsInBestelling = data2;
-    ticketID = data3.id;
-
+    //Select alle tickets met het gegeven bestelnummer
+    var statement = "SELECT * FROM Tickets WHERE bestel_nr = @0";
+    var data = db.Query(statement, bestelNR);
 
     Document doc = new Document(PageSize.A4.Rotate(), 25, 25, 30, 30);
 
@@ -52,10 +58,24 @@
     var titleFont = FontFactory.GetFont("Verdana", 40, BaseColor.BLACK);
     var parFont = FontFactory.GetFont("Verdana", 15, BaseColor.BLACK);
 
-    for (int i = 0; i < aantalTicketsInBestelling; i++)
+    foreach (var row in data)
     {
         // Create new page for each ticket
         doc.NewPage();
+
+        //Get concert van ticket
+        var statement2 = "SELECT * FROM Concerten WHERE id = @0";
+        var data2 = db.Query(statement2, row.concertId);
+
+        //Fill variables
+        artiest = data2.naam;
+        foto += Server.MapPath("~");
+        foto += data2.foto;
+        datum = data2.datum;
+        zaal = data2.zaal_nr;
+        prijs = data2.prijs;
+        aantalTicketsInBestelling = data2;
+        ticketID = row.id;
 
         // Print artist name as ticket title
         var title = new Phrase(artiest, titleFont);
@@ -95,10 +115,8 @@
         if (foto != null)
         {
             artist = Image.GetInstance(foto);
-            artist.ScaleToFit(150f, 150f);
+            artist.ScaleToFit(200f, 200f);
         }
-
-
 
         PdfPTable table = new PdfPTable(3);
         table.DefaultCell.Border = Rectangle.NO_BORDER;
@@ -111,12 +129,11 @@
 
         PdfPCell info = new PdfPCell();
         info.Border = Rectangle.NO_BORDER;
+        info.HorizontalAlignment = 1;
         info.VerticalAlignment = 1;
         info.AddElement(datump);
         info.AddElement(zaalp);
         info.AddElement(prijsp);
-        info.HorizontalAlignment = Element.ALIGN_MIDDLE;
-
 
         table.AddCell(titel);
         table.AddCell(jpg);
@@ -125,25 +142,24 @@
 
         doc.Add(table);
 
-
-
-
-
-
-
-        // TicketID for QR url ophogen
-        ticketID += 1;//steeds met 1 verhoogd per ticket zodat je het juiste ticketID krijgt, kan misschien wel simpeler gemaakt worden
+        Paragraph email = new Paragraph("Dit ticket is ook verstuurd naar het emailadres: " + userEmail.ToString(), parFont);
+        email.Alignment = Element.ALIGN_CENTER;
+        doc.Add(email);
     }
 
     doc.Close();
 
     Response.Clear();
 
+    //Generate pdf on page
+
     string filePath = Server.MapPath("Tickets") + "//" + bestelNR.ToString() + ".pdf";
 
     Response.ContentType = "application/pdf";
 
     Response.WriteFile(filePath);
+
+    //Send mail
 
     try
     {
@@ -152,7 +168,7 @@
         MailMessage newmsg = new MailMessage(mailfrom, mailto);
 
         newmsg.Subject = "Uw Ticket(s)";
-        newmsg.Body = "Hartelijk bedankt voor het bestellen van ticket(s) voor het concert: " + artiest + ". " + "In de bijlage vind u een pdf met uw tickets, deze dient u uit te printen en te laten zien bij binnenkomst";
+        newmsg.Body = "Hartelijk bedankt voor het bestellen van ticket(s) voor het concert: " + artiest + ". " + "In de bijlage vind u een pdf met uw ticket(s), deze dient u te printen en te laten zien bij binnenkomst.";
 
         //For File Attachment, more file can also be attached
         Attachment att = new Attachment(Server.MapPath("Tickets") + "\\" + bestelNR + ".pdf");
@@ -164,11 +180,15 @@
         smtp.EnableSsl = true;
         smtp.Send(newmsg);
     }
+
     catch (Exception ex)
     {
         Response.Write(ex.Message);
     }
+
+    var uri = new Uri(Server.MapPath("Tickets") + "\\" + bestelNR + ".png", UriKind.Absolute);
+    File.Delete(uri.LocalPath);
 }
-@data.foto
+
 
 
