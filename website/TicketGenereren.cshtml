@@ -122,6 +122,7 @@
 
         PdfPTable table = new PdfPTable(3);
         table.DefaultCell.Border = Rectangle.NO_BORDER;
+        table.DefaultCell.VerticalAlignment = 1;
 
         PdfPCell titel = new PdfPCell(title);
         titel.Colspan = 3;
