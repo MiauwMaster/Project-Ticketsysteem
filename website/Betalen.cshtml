@@ -6,51 +6,72 @@
     // Open database connection
     var db = Database.Open("Database");
 
-    /* Eerst checken of bestelling misschien al is betaald */
-    /* Bestel ID moet meegestuurd worden doormiddel van GET of POST */
+    // Variables
+    int bestelNr = 0;
+    decimal total = 0m;
+    bool betaald = false;
 
-    var statementZalen = "SELECT betaald FROM Bestellingen WHERE id = @0"; /* <- bestel ID vanuit de GET of POST */
-    var betaald = db.QueryValue(statementZalen, Request["bestelID"]);
-
-    /* If betaald == true dan hoeft er niet betaald te worden want is al */
-    /* else (false) dan moet er nog betaald worden dus ga door met foreach... */
-
-    var totaal = 0; /* Moet een decimal zijn denk ik, anders double */
-
-    if (betaald != true)
+    // GET request
+    if (!IsPost)
     {
-
-        foreach (var ticket in db.Query("SELECT * FROM Tickets WHERE bestel_nr = 1"))
+        if (!Request.QueryString["id"].IsEmpty() && Request.QueryString["id"].IsInt())
         {
+            // BestelNr from GET request value
+            bestelNr = Convert.ToInt32(Request.QueryString["id"]);
 
-            var korting = ticket.kindOf65plus;
-            var concertId = ticket.concertId;
+            // Eerst checken of bestelling misschien al is betaald
+            var statementBetaald = "SELECT betaald FROM Bestellingen WHERE id = @0"; /* <- bestel ID vanuit de GET of POST */
+            betaald = db.QueryValue(statementBetaald, bestelNr);
 
-            var prijsData = "SELECT prijs FROM Concerten WHERE = @0"; /* gebruik Database.QueryValue() */
-            var prijs = db.QueryValue(prijsData, concertId);
-
-            if (korting)
+            if (betaald == false)
             {
-                totaal += (prijs / 100) * 90;
+                // Loop through all tickets that belong to this bestelling
+                foreach (var ticket in db.Query("SELECT * FROM Tickets WHERE bestel_nr = @0", bestelNr))
+                {
+                    var korting = ticket.kindOf65plus;
+                    var concertId = ticket.concertId;
+
+                    var prijsData = "SELECT prijs FROM Concerten WHERE id = @0";
+                    var prijs = db.QueryValue(prijsData, concertId);
+
+                    if (korting)
+                    {
+                        total += (prijs / 100) * 90;
+                    }
+                    else
+                    {
+                        total += prijs;
+                    }
+
+                }
             }
             else
             {
-                totaal += prijs;
+                Validation.AddFormError("Bestelling is al betaald!");
             }
-
         }
-
+        else
+        {
+            Response.Redirect("~/Winkelwagen.cshtml");
+        }
     }
 
-    if (IsPost && betaald != true)
-    { // Wanneer er op de submit button is geklikt en er is nog niet betaald
-      // Invoeren in database dat er betaald is
-        var betaal = "UPDATE Bestellingen SET betaald = @0 WHERE id = @1";
-        var betalen = db.Execute(betaal, true, Request["bestelID"]);
+    // Validation
+    Validation.RequireFields("bestelling", "pay");
 
-        Response.Redirect("TicketGenereren.cshtml"); // Redirect naar ticket genereren pagina
+    // POST request
+    if (IsPost)
+    {
+        if (Validation.IsValid())
+        {
+            bestelNr = Convert.ToInt32(Request.Form["bestelling"]);
+
+            var betaalStatement = "UPDATE Bestellingen SET betaald = 1 WHERE id = @0";
+            db.Execute(betaalStatement, bestelNr);
+
+            Response.Redirect("~/TicketGenereren.cshtml?id=" + bestelNr);
+        }
     }
-
 }
 
 <!DOCTYPE html>
@@ -62,22 +83,23 @@
 </head>
 <body>
     <div class="payment">
-
+        @Html.ValidationSummary()
         <h2>Betalen</h2>
-        <h3>Bedrag: €@totaal</h3>
+        <h3>Bedrag: &euro;@total</h3>
 
         <p>Kies uw bank</p>
         <form method="post">
             <select name="bank">
                 <option value="ING">ING</option>
                 <option value="Rabobank">Rabobank</option>
-                <option value="ABNamro">ABN amro</option>
+                <option value="ABNamro">ABN Amro</option>
                 <option value="Knab">Knab</option>
-                <option value="deltalloyd">Delte Lloyd</option>
+                <option value="deltalloyd">Delta Lloyd</option>
                 <option value="sns">SNS Bank</option>
                 <option value="AEGON">AEGON Bank</option>
             </select>
             <br />
+            <input type="hidden" name="bestelling" value="@bestelNr" />
             <input type="submit" name="pay" value="Betalen" />
         </form>
         <br />
