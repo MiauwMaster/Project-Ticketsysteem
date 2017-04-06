@@ -16,7 +16,7 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-toggleable-md navbar-light bg-faded">
+        <nav class="navbar fixed-top navbar-toggleable-md navbar-light bg-faded">
             <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -34,19 +34,25 @@
                 <ul class="nav navbar-nav navbar-right">
                     <li><a class="nav-link" href="~/Winkelwagen.cshtml">Winkelmand</a></li>
                 </ul>
-                <form class="form-inline my-2 my-lg-0">
-                    <input class="form-control mr-sm-2" type="text" placeholder="Zoekterm">
-                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Zoeken</button>
-                </form>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a class="nav-link" href="~/Beheer.cshtml">Beheer</a></li>
+                </ul>
             </div>
         </nav>
     </header>
+
     <div>
         @RenderSection("featured", required: false)
         <section id="background">
             @RenderBody()
         </section>
     </div>
+
+    <footer class="footer">
+        <div class="container">
+            <span class="text-muted">Place sticky footer content here.</span>
+        </div>
+    </footer>
     @RenderSection("Scripts", required: false)
     <script src="~/js/jquery-3.2.0.min.js"></script>
     <script src="~/js/bootstrap.js"></script>

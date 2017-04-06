@@ -30,24 +30,27 @@
         }
     }
 }
-<h2>Beheer Login</h2>
-<div>
-    @Html.ValidationSummary()
-    <form method="post">
-        <p>
-            <label for="username">Gebruikersnaam:</label>
-            <input type="text" name="username" value="@Request.Form["username"]" required />
-            @Html.ValidationMessage("username")
-        </p>
+<div id="body" class="container">
+    <h2 class="toptext">Beheer Login</h2>
+    <hr />
+    <div>
+        @Html.ValidationSummary()
+        <form method="post">
+            <p>
+                <label for="username">Gebruikersnaam:</label>
+                <input type="text" name="username" value="@Request.Form["username"]" required />
+                @Html.ValidationMessage("username")
+            </p>
 
-        <p>
-            <label for="password">Wachtwoord:</label>
-            <input type="password" name="password" required />
-            @Html.ValidationMessage("password")
-        </p>
+            <p>
+                <label for="password">Wachtwoord:</label>
+                <input type="password" name="password" required />
+                @Html.ValidationMessage("password")
+            </p>
 
-        <p>
-            <input type="submit" value="Inloggen" />
-        </p>
-    </form>
-</div>
+            <p>
+                <input type="submit" value="Inloggen" />
+            </p>
+        </form>
+    </div>
+</div>s

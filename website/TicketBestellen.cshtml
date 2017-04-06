@@ -128,8 +128,8 @@
             <p>
                 <img src="@photo" alt="Foto" />
             </p>
-            <button class="btn btn-primary" style="width:100%" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-                Meer informatie
+            <button class="btn btn-default" style="width:100%" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                <b>Meer informatie</b>
             </button>
             <div class="collapse" id="collapseExample">
                 <div class="card card-block">
@@ -162,11 +162,11 @@
                         <label for="numberOfTickets">Aantal reguliere tickets</label>
                         <div class="input-group">
                             <span class="input-group-btn">
-                                <button class="btn btn-default value-control" data-action="minus" data-target="regtick">-</button>
+                                <button class="btn btn-default value-control" type="button" data-action="minus" data-target="regtick"><i class="fa fa-minus fa-lg" aria-hidden="true"></i></button>
                             </span>
                             <input name="numberOfTickets" type="number" class="form-control no-padding add-color text-center height-25" id="regtick" maxlength="3" value="0" required>
                             <span class="input-group-btn">
-                                <button class="btn btn-default value-control" data-action="plus" data-target="regtick">+</button>
+                                <button class="btn btn-default value-control" type="button" data-action="plus" data-target="regtick"><i class="fa fa-plus fa-lg" aria-hidden="true"></i></button>
                             </span>
                         </div>
                         @Html.ValidationMessage("numberOfTickets")
@@ -176,11 +176,11 @@
                         <label for="numberOfDiscountTickets">Tickets met korting*</label>
                         <div class="input-group">
                             <span class="input-group-btn">
-                                <button class="btn btn-default value-control" data-action="minus" data-target="distick">-</button>
+                                <button class="btn btn-default value-control" type="button" data-action="minus" data-target="distick"><i class="fa fa-minus fa-lg" aria-hidden="true"></i></button>
                             </span>
                             <input name="numberOfDiscountTickets" type="number" class="form-control no-padding add-color text-center height-25" id="distick" maxlength="3" value="0" required>
                             <span class="input-group-btn">
-                                <button class="btn btn-default value-control" data-action="plus" data-target="distick">+</button>
+                                <button class="btn btn-default value-control" type="button" data-action="plus" data-target="distick"><i class="fa fa-plus fa-lg" aria-hidden="true"></i></button>
                             </span>
                         </div>
                         @Html.ValidationMessage("numberOfDiscountTickets")
@@ -189,7 +189,7 @@
                     <input type="hidden" name="concertId" value="@concertId" />
 
                     <p>
-                        <input type="submit" class="btn btn-primary" value="Tickets toevoegen" />
+                        <input type="submit" style="width:100%" class="btn btn-danger" value="Tickets toevoegen" />
                     </p>
 
                     <p>

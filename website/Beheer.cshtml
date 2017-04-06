@@ -19,10 +19,11 @@
     var grid = new WebGrid(source: data, defaultSort: "Datum");
     grid.SortDirection = SortDirection.Ascending;
 }
-<h2>Beheer</h2>
-<div>
-    <h3>Aankomende concerten:</h3>
-    @grid.GetHtml(
+<div id="body" class="container">
+    <h2 class="toptext">Beheer</h2>
+    <div>
+        <h3>Aankomende concerten:</h3>
+        @grid.GetHtml(
         tableStyle: "grid",
         headerStyle: "head",
         alternatingRowStyle: "alt",
@@ -37,7 +38,8 @@
             )
         )
 
-    <p>
-        <a href="~/ConcertToevoegen.cshtml">Nieuw concert toevoegen</a>
-    </p>
+        <p>
+            <a href="~/ConcertToevoegen.cshtml">Nieuw concert toevoegen</a>
+        </p>
+    </div>
 </div>
