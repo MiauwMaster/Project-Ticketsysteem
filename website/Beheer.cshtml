@@ -12,12 +12,21 @@
     var db = Database.Open("Database");
 
     // SQL statement for concerts
-    var statement = "SELECT * FROM Concerten WHERE datum > @0";
-    var data = db.Query(statement, DateTime.Now);
+    var statement = "SELECT * FROM Concerten";
+    var data = db.Query(statement);
 
     // Create a table (WebGrid) with coming concerts
     var grid = new WebGrid(source: data, defaultSort: "Datum");
     grid.SortDirection = SortDirection.Ascending;
+
+    // Huidige zalen weergeven
+    // SQL statement
+    var statementZalen = "SELECT * FROM Zalen";
+    var selectedData = db.Query(statementZalen);
+
+    // Create a table (WebGrid) with coming concerts
+    var gridTheaters = new WebGrid(source: selectedData, defaultSort: "zaal_nr");
+    gridTheaters.SortDirection = SortDirection.Ascending;
 }
 <div id="body" class="container">
     <h2 class="toptext">Beheer</h2>
@@ -33,6 +42,7 @@
             grid.Column("Beschrijving"),
             grid.Column("Prijs"),
             grid.Column("Datum"),
+            grid.Column(format: @<a href="~/ConcertInfo.cshtml?id=@item.ID">Info</a>),
             grid.Column(format: @<a href="~/ConcertWijzigen.cshtml?id=@item.ID">Wijzigen</a>),
             grid.Column(format: @<a href="~/ConcertVerwijderen.cshtml?id=@item.ID">Verwijderen</a>)
             )
@@ -42,4 +52,19 @@
             <a href="~/ConcertToevoegen.cshtml">Nieuw concert toevoegen</a>
         </p>
     </div>
+</div>
+<div>
+    <h3>Huidige zalen:</h3>
+    @gridTheaters.GetHtml(
+        tableStyle: "grid",
+        headerStyle: "head",
+        alternatingRowStyle: "alt",
+        columns: grid.Columns(
+            grid.Column("zaal_nr"),
+            grid.Column("aantal_plekken")
+            )
+        )
+    <p>
+        <a href="~/ZaalToevoegen.cshtml">Extra zaal toevoegen</a>
+    </p>
 </div>

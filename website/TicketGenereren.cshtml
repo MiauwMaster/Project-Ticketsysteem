@@ -2,10 +2,12 @@
 @using iTextSharp.text;
 @using iTextSharp.text.pdf;
 @using QRCoder;
+@using System.Net.Mail;
 @{
     //Variables
     var artiest = "";
     var foto = "";
+    var userEmail = Session["email"];
     DateTime datum = new DateTime();
     var zaal = 0;
     var prijs = Decimal.One;
@@ -60,6 +62,7 @@
         doc.NewPage();
 
         // Print artist name as ticket title
+<<<<<<< HEAD
         var paragraph1 = new Paragraph(artiest, titleFont);
         paragraph1.Alignment = Element.ALIGN_CENTER;
 
@@ -69,6 +72,9 @@
         var line = new Paragraph("______________________", titleFont);
         line.Alignment = Element.ALIGN_CENTER;
         doc.Add(line);
+=======
+        var title = new Phrase(artiest, titleFont);
+>>>>>>> refs/remotes/origin/master
 
         //Generate QR Code
         QRCodeGenerator qrGenerator = new QRCodeGenerator();
@@ -76,6 +82,7 @@
         QRCode qrCode = new QRCode(qrCodeData);
         System.Drawing.Image qrCodeImage = qrCode.GetGraphic(5);
 
+<<<<<<< HEAD
         // Insert QR Code
         Image jpg = Image.GetInstance(qrCodeImage, BaseColor.WHITE);
         doc.Add(jpg);
@@ -89,16 +96,119 @@
 
         var prijsp = new Paragraph("Prijs: €" + prijs.ToString(), parFont);
         doc.Add(prijsp);
+=======
+        // print QR Code
+        Image jpg = Image.GetInstance(qrCodeImage, BaseColor.WHITE);
+
+        // print rest of ticket info
+        var datump = new Phrase(@"Datum: " + datum.ToString("dd MMMM, yyyy"), parFont);
+        var zaalp = new Phrase("Zaal: " + zaal.ToString(), parFont);
+
+
+        //Checken op korting
+        var statement4 = "SELECT kindOf65plus FROM Tickets WHERE id = @0";
+        var korting = db.QueryValue(statement4, ticketID);
+
+        Phrase prijsp = new Phrase();
+        if (korting == false)
+        {
+            prijsp = new Phrase("Prijs: €" + prijs.ToString(), parFont);
+        }
+
+        else if (korting == true)
+        {
+            decimal prijsMetKorting = prijs * 0.9m;
+            prijsp = new Phrase("Prijs: €" + prijsMetKorting.ToString(), parFont);
+        }
+>>>>>>> refs/remotes/origin/master
 
         // Add artist photo
+        Image artist = null;
         if (foto != null)
         {
+<<<<<<< HEAD
             Image artist = Image.GetInstance(foto);
             doc.Add(artist);
         }
     }
 
     doc.Close();
+=======
+            artist = Image.GetInstance(foto);
+            artist.ScaleToFit(150f, 150f);
+        }
+
+
+
+        PdfPTable table = new PdfPTable(3);
+        table.DefaultCell.Border = Rectangle.NO_BORDER;
+
+        PdfPCell titel = new PdfPCell(title);
+        titel.Colspan = 3;
+        titel.Border = Rectangle.NO_BORDER;
+        titel.FixedHeight = 50f;
+        titel.HorizontalAlignment = 1;
+
+        PdfPCell info = new PdfPCell();
+        info.Border = Rectangle.NO_BORDER;
+        info.VerticalAlignment = 1;
+        info.AddElement(datump);
+        info.AddElement(zaalp);
+        info.AddElement(prijsp);
+        info.HorizontalAlignment = Element.ALIGN_MIDDLE;
+
+
+        table.AddCell(titel);
+        table.AddCell(jpg);
+        table.AddCell(info);
+        table.AddCell(artist);
+
+        doc.Add(table);
+
+
+
+
+
+
+
+        // TicketID for QR url ophogen
+        ticketID += 1;//steeds met 1 verhoogd per ticket zodat je het juiste ticketID krijgt, kan misschien wel simpeler gemaakt worden
+    }
+
+    doc.Close();
+
+    Response.Clear();
+
+    string filePath = Server.MapPath("Tickets") + "//" + bestelNR.ToString() + ".pdf";
+
+    Response.ContentType = "application/pdf";
+
+    Response.WriteFile(filePath);
+
+    try
+    {
+        MailAddress mailfrom = new MailAddress("ticketsysteemnhl@gmail.com");
+        MailAddress mailto = new MailAddress(userEmail.ToString());
+        MailMessage newmsg = new MailMessage(mailfrom, mailto);
+
+        newmsg.Subject = "Uw Ticket(s)";
+        newmsg.Body = "Hartelijk bedankt voor het bestellen van ticket(s) voor het concert: " + artiest + ". " + "In de bijlage vind u een pdf met uw tickets, deze dient u uit te printen en te laten zien bij binnenkomst";
+
+        //For File Attachment, more file can also be attached
+        Attachment att = new Attachment(Server.MapPath("Tickets") + "\\" + bestelNR + ".pdf");
+        newmsg.Attachments.Add(att);
+
+        SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587);
+        smtp.UseDefaultCredentials = false;
+        smtp.Credentials = new NetworkCredential("ticketsysteemnhl@gmail.com", "waltersamplonius");
+        smtp.EnableSsl = true;
+        smtp.Send(newmsg);
+    }
+    catch (Exception ex)
+    {
+        Response.Write(ex.Message);
+    }
+>>>>>>> refs/remotes/origin/master
 }
 @data
 

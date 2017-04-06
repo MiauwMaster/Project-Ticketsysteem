@@ -24,15 +24,6 @@
             Response.Redirect("~/ConcertToevoegen.cshtml");
         }
     }
-
-    // Huidige zalen weergeven
-    // SQL statement
-    var statementZalen = "SELECT * FROM Zalen";
-    var selectedData = db.Query(statementZalen);
-
-    // Create a table (WebGrid) with coming concerts
-    var grid = new WebGrid(source: selectedData, defaultSort: "zaal_nr");
-    grid.SortDirection = SortDirection.Ascending;
 }
 <div id="body" class="container">
     <h2>Zaal toevoegen</h2>
@@ -49,6 +40,7 @@
                 <input type="submit" value="Zaal toevoegen" />
             </p>
 
+<<<<<<< HEAD
             <p>
                 * Een zaalnummer wordt automatisch toegewezen
             </p>
@@ -68,3 +60,10 @@
         )
     </div>
 </div>
+=======
+        <p>
+            * Een zaalnummer wordt automatisch toegewezen
+        </p>
+    </fieldset>
+</form>
+>>>>>>> refs/remotes/origin/master

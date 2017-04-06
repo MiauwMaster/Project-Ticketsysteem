@@ -1,0 +1,89 @@
+﻿@{
+    Page.Title = "Concert Statistieken";
+    Layout = "_SiteLayout.cshtml"; // Dit is de standaard SiteLayout.cshtml, deze moeten we zelf aanpassen naar onze wensen
+
+    // Authentication
+    if (!WebSecurity.IsAuthenticated)
+    {
+        Response.Redirect("~/BeheerLogin.cshtml");
+    }
+
+    // Open database connection
+    var db = Database.Open("Database");
+
+    // Variables
+    var concertId = 0;
+    var maxTickets = 0;
+    var soldTickets = 0;
+    var availableTickets = 0;
+    var earnedMoney = 0m;
+
+    // GET request
+    if (!IsPost)
+    {
+        if (!Request.QueryString["id"].IsEmpty() && Request.QueryString["id"].IsInt())
+        {
+            concertId = Convert.ToInt32(Request.QueryString["id"]);
+
+            // Select the theater used for this concert
+            var zaal_nr = db.QueryValue("SELECT zaal_nr FROM Concerten WHERE id = @0", concertId);
+
+            // Select maximum number of spots in this theater (used for the current concert)
+            maxTickets = db.QueryValue("SELECT aantal_plekken FROM Zalen WHERE zaal_nr = @0", zaal_nr);
+
+            // Select the number of SOLD tickets for the current concert (these tickets need to be PAID)
+            soldTickets = db.QueryValue("SELECT COUNT(*) FROM Tickets INNER JOIN Bestellingen ON Tickets.bestel_nr = Bestellingen.id WHERE Tickets.concertId = @0 AND Bestellingen.betaald = 1", concertId);
+
+            // Number of available tickets
+            availableTickets = maxTickets - soldTickets;
+
+            // Money earned from sold tickets so far
+            foreach (var ticket in db.Query("SELECT * FROM Tickets WHERE concertId = @0", concertId))
+            {
+                var orderNumber = ticket.bestel_nr;
+                var korting = ticket.kindOf65plus;
+                var price = db.QueryValue("SELECT prijs FROM Concerten WHERE id = @0", concertId);
+
+                // If order (where current ticket is part of) is paid
+                if (db.QueryValue("SELECT betaald FROM Bestellingen WHERE id = @0", orderNumber) == true)
+                {
+                    if (korting)
+                    {
+                        earnedMoney += (price / 100) * 90;
+                    }
+                    else
+                    {
+                        earnedMoney += price;
+                    }
+                }
+            }
+        }
+        else
+        {
+            Validation.AddFormError("Geen concert geselecteerd.");
+        }
+    }
+}
+<h2>Concert Informatie</h2>
+@Html.ValidationSummary()
+<div>
+    <p>
+        <h3>Maximaal te verkopen:</h3>
+        @maxTickets
+    </p>
+    <p>
+        <h3>Verkochte tickets:</h3>
+        @soldTickets
+    </p>
+    <p>
+        <h3>Beschikbare tickets:</h3>
+        @availableTickets
+    </p>
+    <p>
+        <h3>Totaal verdient:</h3>
+        @earnedMoney
+    </p>
+    <p>
+        <a href="~/Beheer.cshtml">Terug naar beheer</a>
+    </p>
+</div>

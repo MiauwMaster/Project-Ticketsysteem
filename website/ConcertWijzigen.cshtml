@@ -16,6 +16,7 @@
     var name = "";
     var artist = "";
     var description = "";
+    var theater = 0;
     var price = Decimal.One;
     var date = DateTime.Now;
     var photo = "";
@@ -56,20 +57,23 @@
     if (IsPost)
     {
         // Validation
-        Validation.RequireFields("concertId", "name", "description", "price", "date"); // more
+        Validation.RequireFields("concertId", "name", "description", "theater", "price", "date"); // more
 
         if (Validation.IsValid())
         {
             // POST values
+            concertId = Convert.ToInt32(Request.Form["concertId"]);
             name = Request.Form["name"];
             artist = Request.Form["artist"];
             description = Request.Form["description"];
+            theater = Convert.ToInt32(Request.Form["theater"]);
             price = Convert.ToDecimal(Request.Form["price"]);
             date = Convert.ToDateTime(Request.Form["date"]);
 
-            var statement = "UPDATE Concerten SET naam = @0, artiest = @1, beschrijving = @2, zaal_nr = @3, prijs = @4, datum = @5";
-            //db.Execute();
+            var statement = "UPDATE Concerten SET naam = @0, artiest = @1, beschrijving = @2, zaal_nr = @3, prijs = @4, datum = @5 WHERE id = @6";
+            db.Execute(statement, name, artist, description, theater, price, date, concertId);
 
+            // Redirect to administration page
             Response.Redirect("~/Beheer.cshtml");
         }
     }
@@ -96,8 +100,18 @@
         </p>
 
         <p>
+            <label for="theater">Zaal:</label>
+            <select name="theater"  required>
+                @foreach (var item in db.Query("SELECT * FROM Zalen"))
+                {
+                    <option value="@item.zaal_nr">Zaal @item.zaal_nr: @item.aantal_plekken plekken</option>
+                }
+            </select>
+        </p>
+
+        <p>
             <label for="price">Prijs:</label>
-            <input type="number" name="price" value="@price" />
+            <input type="number" name="price" step="0.01" min="0.01" max="99" value="@price" required />
         </p>
 
         <p>
