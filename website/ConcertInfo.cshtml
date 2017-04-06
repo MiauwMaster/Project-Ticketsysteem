@@ -60,7 +60,7 @@
             }
 
             //Numer of scanned tickets
-            scannedTickets = db.QueryValue(SELECT COUNT(*) FROM Tickets WHERE gebruikt == 1);
+            scannedTickets = db.QueryValue("SELECT COUNT(*) FROM Tickets WHERE gebruikt = 1 AND concertId = @0", concertId);
         }
         else
         {
