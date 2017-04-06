@@ -91,8 +91,8 @@
         Image jpg = Image.GetInstance(qrCodeImage, BaseColor.WHITE);
 
         // print rest of ticket info
-        var datump = new Phrase(@"Datum: \t" + datum.ToString("dd MMMM, yyyy"), parFont);
-        var zaalp = new Phrase("Zaal: \t" + zaal.ToString(), parFont);
+        var datump = new Phrase(@"Datum: " + datum.ToString("dd MMMM, yyyy"), parFont);
+        var zaalp = new Phrase("Zaal: " + zaal.ToString(), parFont);
 
 
         //Checken op korting
@@ -102,13 +102,13 @@
         Phrase prijsp = new Phrase();
         if (korting == false)
         {
-            prijsp = new Phrase("Prijs: \u20AC \t" + prijs.ToString(), parFont);
+            prijsp = new Phrase("Prijs: \u20AC" + prijs.ToString(), parFont);
         }
 
         else if (korting == true)
         {
             decimal prijsMetKorting = prijs * 0.9m;
-            prijsp = new Phrase("Prijs: \u20AC \t" + prijsMetKorting.ToString(), parFont);
+            prijsp = new Phrase("Prijs: \u20AC" + prijsMetKorting.ToString(), parFont);
         }
 
         // Add artist photo
