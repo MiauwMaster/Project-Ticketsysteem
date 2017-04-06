@@ -16,21 +16,15 @@ public class Ticket
         get { return concert; }
     }
 
-    public int Bestelling
-    {
-        get { return bestelling; }
-    }
-
     public bool Korting
     {
         get { return korting; }
     }
 
     // Contructor
-    public Ticket(int concert, int bestelling, bool korting)
+    public Ticket(int concert, bool korting)
     {
         this.concert = concert;
-        this.bestelling = bestelling;
         this.korting = korting;
     }
 

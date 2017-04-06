@@ -1,0 +1,88 @@
+﻿@{
+    /* github change 3 */
+    Page.Title = "Betalen";
+    Layout = "_SiteLayout.cshtml"; // Dit is de standaard SiteLayout.cshtml, deze moeten we zelf aanpassen naar onze wensen
+
+    // Open database connection
+    var db = Database.Open("Database");
+
+    /* Eerst checken of bestelling misschien al is betaald */
+    /* Bestel ID moet meegestuurd worden doormiddel van GET of POST */
+
+    var statementZalen = "SELECT betaald FROM Bestellingen WHERE id = @0"; /* <- bestel ID vanuit de GET of POST */
+    var betaald = db.QueryValue(statementZalen, Request["bestelID"]);
+
+    /* If betaald == true dan hoeft er niet betaald te worden want is al */
+    /* else (false) dan moet er nog betaald worden dus ga door met foreach... */
+
+    var totaal = 0; /* Moet een decimal zijn denk ik, anders double */
+
+    if (betaald != true)
+    {
+
+        foreach (var ticket in db.Query("SELECT * FROM Tickets WHERE bestel_nr = 1"))
+        {
+
+            var korting = ticket.kindOf65plus;
+            var concertId = ticket.concertId;
+
+            var prijsData = "SELECT prijs FROM Concerten WHERE = @0"; /* gebruik Database.QueryValue() */
+            var prijs = db.QueryValue(prijsData, concertId);
+
+            if (korting)
+            {
+                totaal += (prijs / 100) * 90;
+            }
+            else
+            {
+                totaal += prijs;
+            }
+
+        }
+
+    }
+
+    if (IsPost && betaald != true)
+    { // Wanneer er op de submit button is geklikt en er is nog niet betaald
+      // Invoeren in database dat er betaald is
+        var betaal = "UPDATE Bestellingen SET betaald = @0 WHERE id = @1";
+        var betalen = db.Execute(betaal, true, Request["bestelID"]);
+
+        Response.Redirect("TicketGenereren.cshtml"); // Redirect naar ticket genereren pagina
+    }
+
+}
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Betalen</title>
+</head>
+<body>
+    <div class="payment">
+
+        <h2>Betalen</h2>
+        <h3>Bedrag: €@totaal</h3>
+
+        <p>Kies uw bank</p>
+        <form method="post">
+            <select name="bank">
+                <option value="ING">ING</option>
+                <option value="Rabobank">Rabobank</option>
+                <option value="ABNamro">ABN amro</option>
+                <option value="Knab">Knab</option>
+                <option value="deltalloyd">Delte Lloyd</option>
+                <option value="sns">SNS Bank</option>
+                <option value="AEGON">AEGON Bank</option>
+            </select>
+            <br />
+            <input type="submit" name="pay" value="Betalen" />
+        </form>
+        <br />
+        <img src="Images/pay-online.jpg" alt="online betalen" width="auto" height="50" />
+
+    </div>
+</body>
+</html>

@@ -1,4 +1,4 @@
-﻿@{
+﻿﻿@{
     Page.Title = "Ticket Bestellen";
     Layout = "~/_SiteLayout.cshtml";
 
@@ -66,12 +66,10 @@
     if (IsPost)
     {
         // Validation
-        Validation.RequireFields("concertId", "email", "numberOfTickets", "numberOfDiscountTickets");
+        Validation.RequireFields("concertId", "numberOfTickets", "numberOfDiscountTickets");
 
         // Read POST form values
         concertId = Convert.ToInt32(Request.Form["concertId"]);
-        var email = Request.Form["email"];
-        Session["email"] = email;
         var numberOfTickets = Convert.ToInt32(Request.Form["numberOfTickets"]);
         var numberOfDiscountTickets = Convert.ToInt32(Request.Form["numberOfDiscountTickets"]);
 
@@ -80,41 +78,25 @@
             // List of current tickets
             List<Ticket> cart = new List<Ticket>();
 
-            // SQL statement for bestelling insertion
-            var statementBestelling = "INSERT INTO Bestellingen (email) VALUES (@0)";
-            db.Execute(statementBestelling, email);
-            var bestelNr = Convert.ToInt32(db.QueryValue("SELECT @@IDENTITY")); // @@IDENTITY retrieves last auto generated id (auto_incremented) of this (current) connection
-            //Opslaan van variables in sessions zodat ze kunnen worden gebruikt in het ticket
-            Session["bestelnummer"] = bestelNr;
-            Session["concertid"] = concertId;
-
-            // SQL statement for ticket insertion
-            var statementTicket = "INSERT INTO Tickets (kindOf65plus, concertId, bestel_nr) VALUES (@0, @1, @2)";
-
-            // TODO: Dit moet pas na de betaling gebeuren!!!
             // Add regular tickets to cart
             for (int i = 0; i < numberOfTickets; i++)
             {
-                Ticket ticket = new Ticket(concertId, bestelNr, false);
+                Ticket ticket = new Ticket(concertId, false);
                 cart.Add(ticket);
-                db.Execute(statementTicket, 0, concertId, bestelNr);
             }
 
             // Add discount tickets to cart
             for (int i = 0; i < numberOfDiscountTickets; i++)
             {
-                Ticket ticket = new Ticket(concertId, bestelNr, true);
+                Ticket ticket = new Ticket(concertId, true);
                 cart.Add(ticket);
-                db.Execute(statementTicket, 1, concertId, bestelNr);
             }
 
-
-
             // Store list of tickets in cart
-            Session["cart"] = cart; // var cart = (List<Ticket>)Session["cart"]; om terug te casten naar een Ticket List
+            Session["cart"] = cart;
 
             // Redirect to cart
-            Response.Redirect("~/TicketGenereren.cshtml");
+            Response.Redirect("~/Winkelwagen.cshtml");
         }
     }
 }
@@ -135,7 +117,7 @@
                         frameborder="0"></iframe>
             </p>
         }
-        
+
         <p>
             <label for="name">Concert naam:</label>
             <input type="text" name="name" value="@name" readonly />
@@ -167,12 +149,6 @@
 
     <fieldset>
         <legend>Uw gegevens:</legend>
-        <p>
-            <label for="email">Uw e-mailadres</label>
-            <input type="email" name="email" value="@Request.Form["email"]" required />
-            @Html.ValidationMessage("email")
-        </p>
-
         <p>
             <label for="numberOfTickets">Aantal reguliere tickets</label>
             <input type="number" name="numberOfTickets" min="0" value="@Request.Form["numberOfTickets"]" required />

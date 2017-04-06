@@ -14,22 +14,88 @@
         // Fill cart (List) with Tickets from session;
         cart = (List<Ticket>)Session["cart"];
     }
+
+    // Validation
+    Validation.RequireFields("email");
+
+    // POST request
+    if (IsPost)
+    {
+        if (Validation.IsValid())
+        {
+            if (cart.Any())
+            {
+                // POST request values
+                var email = Request.Form["email"];
+
+                // SQL statement for bestelling insertion (betaald attribute of bestelling is by default FALSE)
+                var statementBestelling = "INSERT INTO Bestellingen (email) VALUES (@0)";
+
+                // Insert new bestelling into database
+                db.Execute(statementBestelling, email);
+
+                // Fetch bestelNr (unique ID) from database
+                var bestelNr = Convert.ToInt32(db.QueryValue("SELECT @@IDENTITY")); // // @@IDENTITY retrieves last auto generated id (auto_incremented) of this (current) connection
+
+                // SQL statement for ticket insertion
+                var statementTicket = "INSERT INTO Tickets (kindOf65plus, concertId, bestel_nr) VALUES (@0, @1, @2)";
+
+                // Loop through cart, add each ticket with it attributes to the database:
+                // linked to the bestelling created earlier, which is still unpaid: which
+                // makes the tickets invalid for now!!!
+                foreach (Ticket ticket in cart)
+                {
+                    // Check if this is a discount ticket
+                    if (ticket.Korting)
+                    {
+                        db.Execute(statementTicket, 1, ticket.Concert, bestelNr);
+                    }
+                    else
+                    {
+                        db.Execute(statementTicket, 0, ticket.Concert, bestelNr);
+                    }
+                }
+
+                // Remove everything from cart (session) and abandon session
+                Session.RemoveAll();
+                Session.Abandon();
+
+                // Redirect to payment page with bestelNr in the request
+                // bestelNr makes it possible to retrieve all tickets linked to this bestelling
+                Response.Redirect("~/Betalen.cshtml?id=" + bestelNr);
+            }
+            else
+            {
+                Validation.AddFormError("Winkelwagen is leeg.");
+            }
+        }
+    }
 }
 <h2>Winkelwagen</h2>
+@Html.ValidationSummary()
 @if (cart.Any())
 {
     // Show all tickets in cart
-    //cart.Sort((t1, t2) => t1.Concert.CompareTo(t2.Concert));
     foreach (Ticket ticket in cart)
     {
         var result = db.QuerySingle("SELECT * FROM Concerten WHERE id = @0", ticket.Concert);
         var concertName = result.naam;
         var concertPrice = result.prijs;
-        
+
         <p>
-            @concertName - &euro; @concertPrice - Korting: @ticket.Korting 
+            @concertName - &euro; @concertPrice - Korting: @ticket.Korting
         </p>
     }
+    <form method="post">
+        <p>
+            <label for="email">Uw e-mailadres:</label>
+            <input type="text" name="email" value="@Request.Form["email"]" required />
+            @Html.ValidationMessage("email")
+        </p>
+        <p>
+            <input type="submit" value="Bestelling Betalen" />
+        </p>
+    </form>
 }
 else
 {
