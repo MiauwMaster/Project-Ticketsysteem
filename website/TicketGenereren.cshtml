@@ -1,0 +1,105 @@
+
+@using iTextSharp.text;
+@using iTextSharp.text.pdf;
+@using QRCoder;
+@{
+    //Variables
+    var artiest = "";
+    var foto = "";
+    DateTime datum = new DateTime();
+    var zaal = 0;
+    var prijs = Decimal.One;
+    var aantalTicketsInBestelling = 0;
+    int ticketID = 0;
+    var concertID = Session["concertid"];
+    int bestelNR = Convert.ToInt32(Session["bestelnummer"]); // uit vorige pagina halen
+
+    // Open database connection
+    var db = Database.Open("Database");
+
+    // SQL Statement
+    // Concert info
+    var statement = "SELECT * FROM Concerten WHERE id = @0";
+    var data = db.QuerySingle(statement, concertID); // ID FROM LAST PAGE
+
+    // Aantal tickets
+    var statement2 = "SELECT COUNT(bestel_nr) FROM Tickets WHERE bestel_nr = @0";
+    var data2 = db.QueryValue(statement2, bestelNR);
+
+    //Eerste ID met bestelnummer
+    var statement3 = "SELECT id FROM Tickets WHERE bestel_nr = @0";
+    var data3 = db.QuerySingle(statement3, bestelNR);
+
+
+    //Fill variables
+    artiest = data.naam;
+    foto = data.foto;
+    datum = data.datum;
+    zaal = data.zaal_nr;
+    prijs = data.prijs;
+    aantalTicketsInBestelling = data2;
+    ticketID = data3.id;
+
+
+    Document doc = new Document(PageSize.A4, 25, 25, 30, 30);
+
+
+    PdfWriter writer = PdfWriter.GetInstance(doc, new FileStream(Server.MapPath("Tickets") + "\\" + bestelNR + ".pdf", FileMode.Create));
+    doc.Open();
+
+    // Fonts
+    var titleFont = FontFactory.GetFont("Verdana", 40, BaseColor.BLACK);
+    var parFont = FontFactory.GetFont("Verdana", 15, BaseColor.BLACK);
+
+    for (int i = 0; i <= aantalTicketsInBestelling; i++)
+    {
+        // TicketID for QR url
+        ticketID += 1;//steeds met 1 verhoogd per ticket zodat je het juiste ticketID krijgt, kan misschien wel simpeler gemaakt worden
+       
+        // Create new page for each ticket
+        doc.NewPage();
+
+        // Print artist name as ticket title
+        var paragraph1 = new Paragraph(artiest, titleFont);
+        paragraph1.Alignment = Element.ALIGN_CENTER;
+
+        doc.Add(paragraph1);
+
+        // Horizontal line
+        var line = new Paragraph("______________________", titleFont);
+        line.Alignment = Element.ALIGN_CENTER;
+        doc.Add(line);
+
+        //Generate QR Code
+        QRCodeGenerator qrGenerator = new QRCodeGenerator();
+        QRCodeData qrCodeData = qrGenerator.CreateQrCode("TODO: URL invoegen" + ticketID, QRCodeGenerator.ECCLevel.Q);
+        QRCode qrCode = new QRCode(qrCodeData);
+        System.Drawing.Image qrCodeImage = qrCode.GetGraphic(5);
+
+        // Insert QR Code
+        Image jpg = Image.GetInstance(qrCodeImage, BaseColor.WHITE);
+        doc.Add(jpg);
+
+        // Insert rest of ticket info
+        var datump = new Paragraph("Datum: " + datum.ToString("dd MMMM, yyyy"), parFont);
+        doc.Add(datump);
+
+        var zaalp = new Paragraph("Zaal: " + zaal.ToString(), parFont);
+        doc.Add(zaalp);
+
+        var prijsp = new Paragraph("Prijs: €" + prijs.ToString(), parFont);
+        doc.Add(prijsp);
+
+        // Add artist photo
+        if (foto != null)
+        {
+            Image artist = Image.GetInstance(foto);
+            doc.Add(artist);
+        }
+    }
+
+    doc.Close();
+}
+@data
+
+
