@@ -78,6 +78,11 @@
             // List of current tickets
             List<Ticket> cart = new List<Ticket>();
 
+            if (Session["cart"] != null)
+            {
+                cart = (List<Ticket>)Session["cart"];
+            }
+
             // Add regular tickets to cart
             for (int i = 0; i < numberOfTickets; i++)
             {
