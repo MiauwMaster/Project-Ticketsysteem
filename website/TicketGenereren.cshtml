@@ -161,32 +161,26 @@
 
     //Send mail
 
-    try
-    {
-        MailAddress mailfrom = new MailAddress("ticketsysteemnhl@gmail.com");
-        MailAddress mailto = new MailAddress(userEmail.ToString());
-        MailMessage newmsg = new MailMessage(mailfrom, mailto);
 
-        newmsg.Subject = "Uw Ticket(s)";
-        newmsg.Body = "Hartelijk bedankt voor het bestellen van ticket(s) voor het concert: " + artiest + ". " + "In de bijlage vind u een pdf met uw ticket(s), deze dient u te printen en te laten zien bij binnenkomst.";
+    MailAddress mailfrom = new MailAddress("ticketsysteemnhl@gmail.com");
+    MailAddress mailto = new MailAddress(userEmail.ToString());
+    MailMessage newmsg = new MailMessage(mailfrom, mailto);
 
-        //For File Attachment, more file can also be attached
-        Attachment att = new Attachment(Server.MapPath("Tickets") + "\\" + bestelNR + ".pdf");
-        newmsg.Attachments.Add(att);
+    newmsg.Subject = "Uw Ticket(s)";
+    newmsg.Body = "Hartelijk bedankt voor het bestellen van ticket(s) voor het concert: " + artiest + ". " + "In de bijlage vind u een pdf met uw ticket(s), deze dient u te printen en te laten zien bij binnenkomst.";
 
-        SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587);
-        smtp.UseDefaultCredentials = false;
-        smtp.Credentials = new NetworkCredential("ticketsysteemnhl@gmail.com", "waltersamplonius");
-        smtp.EnableSsl = true;
-        smtp.Send(newmsg);
-    }
+    //For File Attachment, more file can also be attached
+    Attachment att = new Attachment(Server.MapPath("Tickets") + "\\" + bestelNR + ".pdf");
+    newmsg.Attachments.Add(att);
 
-    catch (Exception ex)
-    {
-        Response.Write(ex.Message);
-    }
+    SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587);
+    smtp.UseDefaultCredentials = false;
+    smtp.Credentials = new NetworkCredential("ticketsysteemnhl@gmail.com", "waltersamplonius");
+    smtp.EnableSsl = true;
+    smtp.Send(newmsg);
 
-    var uri = new Uri(Server.MapPath("Tickets") + "\\" + bestelNR + ".png", UriKind.Absolute);
+
+    var uri = new Uri(Server.MapPath("Tickets") + "\\" + bestelNR + ".pdf", UriKind.Absolute);
     File.Delete(uri.LocalPath);
 }
 
