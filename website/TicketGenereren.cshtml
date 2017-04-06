@@ -16,6 +16,9 @@
     var concertID = Session["concertid"];
     var bestelNR = Request.QueryString["id"]; // uit vorige pagina halen
 
+    // Random for pdf name
+    var rand = new Random().next(1111111,9999999);
+
     //Get email
 
     var statement5 = "SELECT email FROM Bestellingen WHERE id = @0";
@@ -51,7 +54,7 @@
 
     Document doc = new Document(PageSize.A4.Rotate(), 25, 25, 30, 30);
 
-    PdfWriter writer = PdfWriter.GetInstance(doc, new FileStream(Server.MapPath("Tickets") + "\\" + bestelNR + ".pdf", FileMode.Create));
+    PdfWriter writer = PdfWriter.GetInstance(doc, new FileStream(Server.MapPath("Tickets") + "\\" + bestelNR + rand + ".pdf", FileMode.Create));
     doc.Open();
 
     // Fonts
@@ -74,6 +77,7 @@
         zaal = data2.zaal_nr;
         prijs = data2.prijs;
         ticketID = row.id;
+        
 
         // Print artist name as ticket title
         var title = new Phrase(artiest, titleFont);
@@ -165,10 +169,10 @@
     MailMessage newmsg = new MailMessage(mailfrom, mailto);
 
     newmsg.Subject = "Uw Ticket(s)";
-    newmsg.Body = "Hartelijk bedankt voor het bestellen van ticket(s) voor het concert: " + artiest + ". " + "In de bijlage vind u een pdf met uw ticket(s), deze dient u te printen en te laten zien bij binnenkomst.";
+    newmsg.Body = "Hartelijk bedankt voor het bestellen. " + "In de bijlage vind u een pdf met uw ticket(s), deze dient u te printen en te laten zien bij binnenkomst.";
 
     //For File Attachment, more file can also be attached
-    Attachment att = new Attachment(Server.MapPath("Tickets") + "\\" + bestelNR + ".pdf");
+    Attachment att = new Attachment(Server.MapPath("Tickets") + "\\" + bestelNR + rand + ".pdf");
     newmsg.Attachments.Add(att);
 
     SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587);
@@ -176,10 +180,6 @@
     smtp.Credentials = new NetworkCredential("ticketsysteemnhl@gmail.com", "waltersamplonius");
     smtp.EnableSsl = true;
     smtp.Send(newmsg);
-
-
-    var uri = new Uri(Server.MapPath("Tickets") + "\\" + bestelNR + ".pdf", UriKind.Absolute);
-    File.Delete(uri.LocalPath);
 }
 
 
