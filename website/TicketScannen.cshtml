@@ -10,13 +10,13 @@
     var isBetaald = false;
     var message = "Ticket niet gescand";
 
-     
-    if (!Request.QueryString["id"].IsEmpty() && Request.QueryString["id"].IsInt()) 
+
+    if (!Request.QueryString["id"].IsEmpty() && Request.QueryString["id"].IsInt())
     {
         //Read URL
         ticketID = Convert.ToInt32(Request.QueryString["id"]);
         message = "Ticket is gelezen";
-        
+
         //SQL
         var statement = "SELECT bestel_nr FROM Tickets WHERE id = @0";
         var data = db.QueryValue(statement, ticketID);
@@ -29,16 +29,16 @@
 
         if (data2 != null)
         {
-            //Check payment status 
+            //Check payment status
             isBetaald = data2.betaald;
-            if(isBetaald == false)
+            if (isBetaald == false)
             {
                 message = "Ticket is nog niet betaald";
             }
-            else if(isBetaald == true)
+            else if (isBetaald == true)
             {
                 // Check if ticket is already used
-                if(data3 == true)
+                if (data3 == true)
                 {
                     message = "Ticket is al gebruikt!";
                 }
@@ -46,10 +46,10 @@
                 //Set ticket used
                 else
                 {
-                message = "Ticket is betaald en ingescand. Veel plezier bij het concert!";
-                db.Execute("UPDATE Tickets SET gebruikt = 1 WHERE id = @0", ticketID);
+                    message = "Ticket is betaald en ingescand. Veel plezier bij het concert!";
+                    db.Execute("UPDATE Tickets SET gebruikt = 1 WHERE id = @0", ticketID);
                 }
-               
+
             }
         }
     }

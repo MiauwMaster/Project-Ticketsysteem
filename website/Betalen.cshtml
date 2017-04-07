@@ -73,38 +73,37 @@
         }
     }
 }
-
-<!DOCTYPE html>
-
-<html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <title>Betalen</title>
-</head>
-<body>
-    <div class="payment">
-        @Html.ValidationSummary()
-        <h2>Betalen</h2>
-        <h3>Bedrag: &euro;@total</h3>
-
-        <p>Kies uw bank</p>
-        <form method="post">
-            <select name="bank">
-                <option value="ING">ING</option>
-                <option value="Rabobank">Rabobank</option>
-                <option value="ABNamro">ABN Amro</option>
-                <option value="Knab">Knab</option>
-                <option value="deltalloyd">Delta Lloyd</option>
-                <option value="sns">SNS Bank</option>
-                <option value="AEGON">AEGON Bank</option>
-            </select>
+<div id="body" class="container">
+    <h2 class="toptext">Betalen</h2>
+    <hr />
+    <div class="row">
+        <div class="col-md-4">
+        </div>
+        <div class="col-md-4 payment">
+            @Html.ValidationSummary()
+            <h3 class="centertext">Bedrag: &euro;@total</h3>
             <br />
-            <input type="hidden" name="bestelling" value="@bestelNr" />
-            <input type="submit" name="pay" value="Betalen" />
-        </form>
-        <br />
-        <img src="Images/pay-online.jpg" alt="online betalen" width="auto" height="50" />
-
+            <p class="centertext">Kies uw bank</p>
+            <form method="post">
+                <p class="centertext">
+                    <select name="bank">
+                        <option value="ING">ING</option>
+                        <option value="Rabobank">Rabobank</option>
+                        <option value="ABNamro">ABN Amro</option>
+                        <option value="Knab">Knab</option>
+                        <option value="deltalloyd">Delta Lloyd</option>
+                        <option value="sns">SNS Bank</option>
+                        <option value="AEGON">AEGON Bank</option>
+                    </select>
+                </p>
+                <br />
+                <input type="hidden" name="bestelling" value="@bestelNr" />
+                <input type="submit" class="btn btn-danger btn-block" name="pay" value="Betalen" />
+            </form>
+            @*<br />
+            <img src="Images/pay-online.jpg" alt="online betalen" width="50" height="50" />*@
+        </div>
+        <div class="col-md-4">
+        </div>
     </div>
-</body>
-</html>
+</div>

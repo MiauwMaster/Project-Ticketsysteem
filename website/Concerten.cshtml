@@ -4,29 +4,62 @@
 
     // Open database connection
     var db = Database.Open("Database");
+    System.Globalization.CultureInfo ci = new System.Globalization.CultureInfo("nl-NL");
 
     // SQL statement
-    var statement = "SELECT * FROM Concerten WHERE datum > @0";
+    var statement = "SELECT * FROM Concerten WHERE datum > @0 ORDER BY datum ASC";
     var selectedData = db.Query(statement, DateTime.Now);
-
-    // Create a table (WebGrid) with coming concerts
-    var grid = new WebGrid(source: selectedData, defaultSort: "Datum");
-    grid.SortDirection = SortDirection.Ascending;
 }
-<h2>Aankomende concerten</h2>
-<div>
-    @grid.GetHtml(
-        tableStyle: "grid",
-        headerStyle: "head",
-        alternatingRowStyle: "alt",
-        columns: grid.Columns(
-            grid.Column("Naam"),
-            grid.Column("Artiest"),
-            grid.Column("Beschrijving"),
-            grid.Column("Prijs"),
-            grid.Column("Datum"),
-            grid.Column(format: @<a href="~/TicketBestellen.cshtml?id=@item.ID">Bestel</a>)
-            )
-        )
-</div>
+<div id="body" class="container">
+    <h2 class="toptext">Aankomende concerten</h2>
+    <hr />
+        <div class="agenda">
+            <div class="table-responsive">
+                <table class="table table-condensed table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Datum</th>
+                            <th>Tijd</th>
+                            <th>Naam</th>
+                            <th>Artiest</th>
+                            <th>Prijs</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
 
+                        @foreach (var item in selectedData)
+                        {
+                            DateTime datum = item.Datum;
+
+                            <tr>
+                                <td class="agenda-date active" rowspan="1">
+                                    <div class="dayofmonth">@datum.Day</div>
+                                    <div class="dayofweek">@datum.ToString("dddd", ci)</div>
+                                    <div class="shortdate text-muted">@datum.ToString("MMMM", ci), @datum.Year</div>
+                                </td>
+                                <td class="agenda-time">
+                                    @datum.ToString("H:mm")
+                                </td>
+                                <td class="agenda-events">
+                                    <div class="agenda-event">
+                                        @item.Naam
+                                    </div>
+                                </td>
+                                <td class="agenda-beschrijving">
+                                    @item.Artiest
+                                </td>
+                                <td class="agenda-prijs">
+                                    €@item.Prijs
+                                </td>
+                                <td class="agenda-bestel">
+                                    <a href="/TicketBestellen.cshtml?id=@item.ID"><input type="submit" name="buttonTicket" value="Bestel" class="btn btn-danger" /></a>
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+</div>

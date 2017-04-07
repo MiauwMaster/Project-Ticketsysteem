@@ -2,12 +2,6 @@
     Page.Title = "Zaal Toevoegen";
     Layout = "_SiteLayout.cshtml"; // Dit is de standaard SiteLayout.cshtml, deze moeten we zelf aanpassen naar onze wensen
 
-    // Authentication
-    if(!WebSecurity.IsAuthenticated)
-    {
-        Response.Redirect("~/BeheerLogin.cshtml");
-    }
-
     // Open database connection
     var db = Database.Open("Database");
 
@@ -31,22 +25,31 @@
         }
     }
 }
-<h2>Zaal toevoegen</h2>
-@Html.ValidationSummary()
-<form method="post">
-    <fieldset>
-        <legend>Zaal informatie</legend>
-        <p>
-            <label for="numberOfSpots">Aantal plekken:</label>
-            <input type="number" name="numberOfSpots" min="1" /> 
-        </p>
+<div id="body" class="container">
+    <h2 class="toptext">Zaal toevoegen</h2>
+    <hr />
+    @Html.ValidationSummary()
+    <form method="post">
+        <fieldset>
+            <legend>Zaal informatie</legend>
+            <p class="centertext">
+                <label for="numberOfSpots">Aantal plekken:</label>
+            </p>
+            <p class ="centertext">
+                <input type="number" name="numberOfSpots" min="1" />
+            </p>
+            <br />
 
-        <p>
-            <input type="submit" value="Zaal toevoegen" />
-        </p>
-
-        <p>
-            * Een zaalnummer wordt automatisch toegewezen
-        </p>
-    </fieldset>
-</form>
+            <p class="centertext">
+                <input type="submit" class="btn btn-danger" value="Zaal toevoegen" />
+            </p>
+            <p class="centertext">
+                * Een zaalnummer wordt automatisch toegewezen
+            </p>
+        </fieldset>
+    </form>
+    <br />
+    <p class="centertext">
+        <a href="~/Beheer.cshtml" class="btn btn-danger"><i class="fa fa-arrow-left"></i> Terug naar beheer</a>
+    </p>
+</div>

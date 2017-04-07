@@ -4,6 +4,7 @@
 
     // Open database connection
     var db = Database.Open("Database");
+    System.Globalization.CultureInfo ci = new System.Globalization.CultureInfo("nl-NL");
 
     // Create empty list of tickets
     List<Ticket> cart = new List<Ticket>();
@@ -15,11 +16,30 @@
         cart = (List<Ticket>)Session["cart"];
     }
 
+    // Prijzen berekenen
+    var concertData = "SELECT * FROM Concerten";
+    var concertenRow = db.Query(concertData);
+
+    var total = 0;
+    foreach (Ticket ticket in cart) {
+        var prijsData = "SELECT prijs FROM Concerten WHERE id = @0";
+        var prijs = db.QueryValue(prijsData, ticket.Concert);
+
+        if (ticket.Korting)
+        {
+            total += prijs* 0.9m;
+        }
+        else
+        {
+            total += prijs;
+        }
+    }
+
     // Validation
     Validation.RequireFields("email");
 
     // POST request
-    if (IsPost)
+    if (!Request["buttonBetalen"].IsEmpty())
     {
         if (Validation.IsValid())
         {
@@ -71,35 +91,144 @@
         }
     }
 }
-<h2>Winkelwagen</h2>
-@Html.ValidationSummary()
-@if (cart.Any())
-{
-    // Show all tickets in cart
-    foreach (Ticket ticket in cart)
+<div class="container" id="body">
+    <h2 class="toptext">Winkelwagen</h2>
+    <hr />
+    @Html.ValidationSummary()
+    @if (cart.Any())
     {
-        var result = db.QuerySingle("SELECT * FROM Concerten WHERE id = @0", ticket.Concert);
-        var concertName = result.naam;
-        var concertPrice = result.prijs;
+        // Show all tickets in cart
+        <div class="row">
+            <table id="cart" class="table table-hover table-condensed">
+                <thead>
+                    <tr>
+                        <th style="width:50%">Concert</th>
+                        <th style="width:10%">Prijs</th>
+                        <th style="width:8%">Aantal</th>
+                        <th style="width:22%" class="text-center">Subtotaal</th>
+                        <th style="width:10%"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var concert in concertenRow)
+                    {
+                        int aantal = 0;
+                        var concertName = "";
+                        decimal concertPrice = 0.00m;
+                        DateTime datum = DateTime.MinValue;
+                        foreach (Ticket ticket in cart)
+                        {
+                            if (ticket.Korting == true)
+                            {
+                                if (ticket.Concert == concert.id)
+                                {
+                                    concertPrice = concert.prijs * 0.9m;
+                                    concertName = concert.naam.ToString() + " met korting";
+                                    datum = concert.datum;
+                                    aantal++;
+                                }
+                            }
+                        }
+                        var subtotal = aantal * concertPrice;
+                        if (aantal != 0)
+                        {
+                            <tr>
+                                <td data-th="Product">
+                                    <div class="row">
+                                        <div class="col-sm-10">
+                                            <h4 class="nomargin">@concertName</h4>
+                                            <p>@datum.ToString("dddd", ci) @datum.Day @datum.ToString("MMMM", ci) @datum.Year</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td data-th="Prijs">&euro; @concertPrice</td>
+                                <td data-th="Aantal">
+                                    <input name="numberOfTickets" type="number" class="form-control text-center" value="@aantal">
+                                </td>
+                                <td data-th="Subtotal" class="text-center">&euro; @subtotal</td>
+                                <td class="actions" data-th="">
+                                    <form method="post">
+                                        <button name="refreshButton" class="btn btn-info btn-sm" type="submit"><i class="fa fa-refresh"></i></button>
+                                        <button class="btn btn-danger btn-sm" type="submit"><i class="fa fa-trash-o"></i></button>
+                                        <input type="hidden" name="concertId" value="@concert.id" />
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                        aantal = 0;
+                        foreach (Ticket ticket in cart)
+                        {
+                            if (ticket.Korting == false)
+                            {
+                                if (ticket.Concert == concert.id)
+                                {
+                                    concertPrice = concert.prijs;
+                                    concertName = concert.naam.ToString();
+                                    datum = concert.datum;
+                                    aantal++;
+                                }
+                            }
+                        }
+                        subtotal = aantal * concertPrice;
+                        if (aantal != 0)
+                        {
+                            <tr>
+                                <td data-th="Product">
+                                    <div class="row">
+                                        <div class="col-sm-10">
+                                            <h4 class="nomargin">@concertName</h4>
+                                            <p>@datum.ToString("dddd", ci) @datum.Day @datum.ToString("MMMM", ci) @datum.Year</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td data-th="Prijs">&euro; @concertPrice</td>
+                                <td data-th="Aantal">
+                                    <input name="numberOfDiscountTickets" type="number" class="form-control text-center" value="@aantal">
+                                </td>
+                                <td data-th="Subtotal" class="text-center">&euro; @subtotal</td>
+                                <td class="actions" data-th="">
+                                    <form method="post">
+                                        <button name="refreshButton" class="btn btn-info btn-sm" type="submit"><i class="fa fa-refresh"></i></button>
+                                        <button class="btn btn-danger btn-sm" type="submit"><i class="fa fa-trash-o"></i></button>
+                                        <input type="hidden" name="concertId" value="@concert.id" />
+                                    </form>
+                                </td>
+                            </tr>
+                        }
 
-        <p>
-            @concertName - &euro; @concertPrice - Korting: @ticket.Korting
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td><a href="~/Default.cshtml" class="btn btn-warning"><i class="fa fa-angle-left"></i> Meer tickets kopen</a></td>
+                        <td colspan="2" class="hidden-xs"></td>
+                        <td class="hidden-xs text-center"><strong>&euro; @total</strong></td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+            </div>
+            <div class="row">
+                    <div class="col-md-6">
+                    </div>
+                    <div class="col-md-6">
+                        <form method="post">
+                            <p>
+                                <label class="centertext" for="email">Uw e-mailadres:</label>
+                                <input type="text" name="email" value="@Request.Form["email"]" class="btn-block" required />
+                                @Html.ValidationMessage("email")
+                            </p>
+                            <p>
+                                <input name="buttonBetalen" type="submit" class="btn btn-success btn-block" value="Bestelling Betalen" />
+                            </p>
+                        </form>
+                </div>
+            </div>
+    }
+    else
+    {
+        <p class="centertext">
+            Geen tickets in winkelwagen
         </p>
     }
-    <form method="post">
-        <p>
-            <label for="email">Uw e-mailadres:</label>
-            <input type="text" name="email" value="@Request.Form["email"]" required />
-            @Html.ValidationMessage("email")
-        </p>
-        <p>
-            <input type="submit" value="Bestelling Betalen" />
-        </p>
-    </form>
-}
-else
-{
-    <p>
-        Geen tickets in winkelwagen
-    </p>
-}
+</div>

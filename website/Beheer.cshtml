@@ -8,61 +8,177 @@
         Response.Redirect("~/BeheerLogin.cshtml");
     }
 
+    //Logout
+    if (!Request["buttonLogout"].IsEmpty())
+    {
+        WebSecurity.Logout();
+        Response.Redirect("~/Default.cshtml");
+    }
+
     // Open database connection
     var db = Database.Open("Database");
+    System.Globalization.CultureInfo ci = new System.Globalization.CultureInfo("nl-NL");
 
     // SQL statement for concerts
     var statement = "SELECT * FROM Concerten";
-    var data = db.Query(statement);
+    var dataConcerten = db.Query(statement);
 
     // Create a table (WebGrid) with coming concerts
-    var grid = new WebGrid(source: data, defaultSort: "Datum");
+    var grid = new WebGrid(source: dataConcerten, defaultSort: "Datum");
     grid.SortDirection = SortDirection.Ascending;
 
     // Huidige zalen weergeven
     // SQL statement
     var statementZalen = "SELECT * FROM Zalen";
-    var selectedData = db.Query(statementZalen);
+    var dataZalen = db.Query(statementZalen);
 
-    // Create a table (WebGrid) with coming concerts
-    var gridTheaters = new WebGrid(source: selectedData, defaultSort: "zaal_nr");
-    gridTheaters.SortDirection = SortDirection.Ascending;
 }
-<h2>Beheer</h2>
-<div>
-    <h3>Aankomende concerten:</h3>
-    @grid.GetHtml(
-        tableStyle: "grid",
-        headerStyle: "head",
-        alternatingRowStyle: "alt",
-        columns: grid.Columns(
-            grid.Column("Naam"),
-            grid.Column("Artiest"),
-            grid.Column("Beschrijving"),
-            grid.Column("Prijs"),
-            grid.Column("Datum"),
-            grid.Column(format: @<a href="~/ConcertInfo.cshtml?id=@item.ID">Info</a>),
-            grid.Column(format: @<a href="~/ConcertWijzigen.cshtml?id=@item.ID">Wijzigen</a>),
-            grid.Column(format: @<a href="~/ConcertVerwijderen.cshtml?id=@item.ID">Verwijderen</a>)
-            )
-        )
+<div id="body" class="container">
+    <h2 class="toptext">Beheer</h2>
+    <hr />
+    <div class="row">
+        <div class="col-md-6">
+            <h3 class="text-center">Welkom!</h3>
+            <hr />
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla suscipit tincidunt condimentum. Quisque sit amet vehicula tellus, ut faucibus elit. Morbi fringilla nulla at ex molestie ullamcorper. Mauris nec porttitor nisi. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Aenean elementum massa id egestas elementum. Ut pretium nibh in ligula tincidunt condimentum. Duis a malesuada enim.</p>
+            <form method="post">
+                <p>
+                    <input name="buttonLogout" type="submit" style="width:100%" class="btn btn-danger" value="Uitloggen" />
+                </p>
+            </form>
+        </div>
+        <div class="col-md-6">
+            <div class="panel panel-default panel-table">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col col-xs-6">
+                            <h3 class="panel-title">Huidige zalen</h3>
+                        </div>
+                        <div class="col col-xs-6 text-right">
+                            <a href="~/ZaalToevoegen.cshtml" class="btn btn-sm btn-danger btn-create">Nieuwe zaal</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <table class="table-hover table table-striped table-bordered table-list">
+                        <thead>
+                            <tr>
+                                <th>Zaal nummer</th>
+                                <th>Aantal plekken</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in dataZalen)
+                            {
+                                <tr>
+                                    <td>@item.zaal_nr</td>
+                                    <td>@item.aantal_plekken</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                @*<div class="panel-footer">
+                <div class="row">
+                    <div class="col col-xs-4">
+                        Page 1 of 5
+                    </div>
+                    <div class="col col-xs-8">
+                        <ul class="pagination hidden-xs pull-right">
+                            <li><a href="#">1</a></li>
+                            <li><a href="#">2</a></li>
+                            <li><a href="#">3</a></li>
+                            <li><a href="#">4</a></li>
+                            <li><a href="#">5</a></li>
+                        </ul>
+                        <ul class="pagination visible-xs pull-right">
+                            <li><a href="#">«</a></li>
+                            <li><a href="#">»</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>*@
+            </div>
+        </div>
+    </div>
+    <hr />
+    <div>
+        <div class="panel panel-default panel-table">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col col-xs-6">
+                        <h3 class="panel-title">Aankomende concerten</h3>
+                    </div>
+                    <div class="col col-xs-6 text-right">
+                        <a href="~/ConcertToevoegen.cshtml" class="btn btn-sm btn-danger btn-create">Nieuw concert</a>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body">
+                <table class="table-hover table table-striped table-bordered table-list">
+                    <thead>
+                        <tr>
+                            <th>Datum</th>
+                            <th>Tijd</th>
+                            <th>Naam</th>
+                            <th>Artiest</th>
+                            <th>Prijs</th>
+                            <th class="text-center"><em class="fa fa-cog"></em></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in dataConcerten)
+                        {
+                            DateTime datum = item.Datum;
 
-    <p>
-        <a href="~/ConcertToevoegen.cshtml">Nieuw concert toevoegen</a>
-    </p>
-</div>
-<div>
-    <h3>Huidige zalen:</h3>
-    @gridTheaters.GetHtml(
-        tableStyle: "grid",
-        headerStyle: "head",
-        alternatingRowStyle: "alt",
-        columns: grid.Columns(
-            grid.Column("zaal_nr"),
-            grid.Column("aantal_plekken")
-            )
-        )
-    <p>
-        <a href="~/ZaalToevoegen.cshtml">Extra zaal toevoegen</a>
-    </p>
+                            <tr>
+                                <td class="agenda-date active" rowspan="1">
+                                    <div class="dayofmonth">@datum.Day</div>
+                                    <div class="dayofweek">@datum.ToString("dddd", ci)</div>
+                                    <div class="shortdate text-muted">@datum.ToString("MMMM", ci), @datum.Year</div>
+                                </td>
+                                <td>
+                                    @datum.ToString("H:mm")
+                                </td>
+                                <td>
+                                    @item.Naam
+                                </td>
+                                <td>
+                                    @item.Artiest
+                                </td>
+                                <td>
+                                    &euro;@item.Prijs
+                                </td>
+                                <td align="center">
+                                    <a href="~/ConcertInfo.cshtml?id=@item.ID" class="btn btn-secondary"><i class="fa fa-info"></i></a>
+                                    <a href="~/ConcertWijzigen.cshtml?id=@item.ID" class="btn btn-secondary"><i class="fa fa-pencil"></i></a>
+                                    <a href="~/ConcertVerwijderen.cshtml?id=@item.ID" class="btn btn-danger"><i class="fa fa-trash"></i></a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            @*<div class="panel-footer">
+                    <div class="row">
+                        <div class="col col-xs-4">
+                            Page 1 of 5
+                        </div>
+                        <div class="col col-xs-8">
+                            <ul class="pagination hidden-xs pull-right">
+                                <li><a href="#">1</a></li>
+                                <li><a href="#">2</a></li>
+                                <li><a href="#">3</a></li>
+                                <li><a href="#">4</a></li>
+                                <li><a href="#">5</a></li>
+                            </ul>
+                            <ul class="pagination visible-xs pull-right">
+                                <li><a href="#">«</a></li>
+                                <li><a href="#">»</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>*@
+        </div>
+    </div>
 </div>

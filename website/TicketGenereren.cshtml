@@ -16,7 +16,7 @@
     var bestelNR = Request.QueryString["id"]; // uit vorige pagina halen
 
     // Random for pdf name
-    var rand = new Random().Next(1111111,9999999);
+    var rand = new Random().Next(1111111, 9999999);
 
     //Get email
 
@@ -181,6 +181,3 @@
     smtp.EnableSsl = true;
     smtp.Send(newmsg);
 }
-
-
-

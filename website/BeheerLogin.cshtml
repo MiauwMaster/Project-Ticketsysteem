@@ -3,9 +3,14 @@
     Layout = "_SiteLayout.cshtml";
 
     // Authentication
-            if (WebSecurity.IsAuthenticated)
+    if (WebSecurity.IsAuthenticated)
     {
         Response.Redirect("~/Beheer.cshtml");
+    }
+
+    if (!WebSecurity.UserExists("test"))
+    {
+        WebSecurity.CreateUserAndAccount("test", "test");
     }
 
     // Validation
@@ -30,24 +35,31 @@
         }
     }
 }
-<h2>Beheer Login</h2>
-<div>
-    @Html.ValidationSummary()
-    <form method="post">
-        <p>
-            <label for="username">Gebruikersnaam:</label>
-            <input type="text" name="username" value="@Request.Form["username"]" required />
-            @Html.ValidationMessage("username")
-        </p>
+<div class="container" id="body">
+    <h2 class="toptext">Beheer Login</h2>
+    <hr />
+    <div class="row">
+        <div class="col-lg-4"></div>
+        <div class="col-lg-4">
+            @Html.ValidationSummary()
+            <form method="post">
+                <p class="text-center label"><label for="username">Gebruikersnaam:</label></p>
+                <p>
+                    <input class="btn-block" type="text" name="username" value="@Request.Form["username"]" required />
+                    @Html.ValidationMessage("username")
+                </p>
 
-        <p>
-            <label for="password">Wachtwoord:</label>
-            <input type="password" name="password" required />
-            @Html.ValidationMessage("password")
-        </p>
+                <p class="text-center label"><label for="password">Wachtwoord:</label></p>
+                <p>
+                    <input class="btn-block" type="password" name="password" required />
+                    @Html.ValidationMessage("password")
+                </p>
 
-        <p>
-            <input type="submit" value="Inloggen" />
-        </p>
-    </form>
+                <p class="text-center">
+                    <input type="submit" class="textcenter btn btn-danger login_width" value="Inloggen" />
+                </p>
+            </form>
+        </div>
+        <div class="col-lg-4"></div>
+    </div>
 </div>

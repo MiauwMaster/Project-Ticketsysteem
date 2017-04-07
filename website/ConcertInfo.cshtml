@@ -44,7 +44,6 @@
                 var orderNumber = ticket.bestel_nr;
                 var korting = ticket.kindOf65plus;
                 var price = db.QueryValue("SELECT prijs FROM Concerten WHERE id = @0", concertId);
-
                 // If order (where current ticket is part of) is paid
                 if (db.QueryValue("SELECT betaald FROM Bestellingen WHERE id = @0", orderNumber) == true)
                 {
@@ -58,7 +57,6 @@
                     }
                 }
             }
-
             //Numer of scanned tickets
             scannedTickets = db.QueryValue("SELECT COUNT(*) FROM Tickets WHERE gebruikt = 1 AND concertId = @0", concertId);
         }
@@ -68,30 +66,32 @@
         }
     }
 }
-<h2>Concert Informatie</h2>
-@Html.ValidationSummary()
-<div>
-    <p>
-        <h3>Maximaal te verkopen:</h3>
-        @maxTickets
-    </p>
-    <p>
-        <h3>Verkochte tickets:</h3>
-        @soldTickets
-    </p>
-    <p>
-        <h3>Beschikbare tickets:</h3>
-        @availableTickets
-    </p>
-    <p>
-        <h3>Totaal verdiend:</h3>
-        @earnedMoney
-    </p>
-    <p>
-        <h3>Totaale opkomst:</h3>
-        @scannedTickets
-    </p>
-    <p>
-        <a href="~/Beheer.cshtml">Terug naar beheer</a>
-    </p>
+<div class="container" id="body">
+    <h2 class="toptext">Concert Informatie</h2>
+    <hr />
+    <div class="row">
+        <div class="col-lg-4"></div>
+        <div class="col-lg-4">
+            @Html.ValidationSummary()
+            <h3 class="centertext">Maximaal te verkopen:</h3>
+            <p class="centertext">@maxTickets</p>
+            <br />
+            <h3 class="centertext">Verkochte tickets:</h3>
+            <p class="centertext">@soldTickets</p>
+            <br />
+            <h3 class="centertext">Beschikbare tickets:</h3>
+            <p class="centertext">@availableTickets</p>
+            <br />
+            <h3 class="centertext">Totaal verdiend:</h3>
+            <p class="centertext">€@earnedMoney</p>
+            <br />
+            <h3 class="centertext">Totale opkomst:</h3>
+            <p class="centertext">@scannedTickets</p>
+            <br />
+            <p class="centertext">
+            <a href="~/Beheer.cshtml" class="btn btn-danger"><i class="fa fa-arrow-left"></i> Terug naar beheer</a>
+        </p>
+        </div>
+        <div class="col-lg-4"></div>
+    </div>
 </div>

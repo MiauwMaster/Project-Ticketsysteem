@@ -4,6 +4,7 @@
 
     // Open database connection
     var db = Database.Open("Database");
+    System.Globalization.CultureInfo ci = new System.Globalization.CultureInfo("nl-NL");
 
     // Variables
     var concertId = 0;
@@ -105,73 +106,81 @@
         }
     }
 }
-<h2>Ticket Bestellen</h2>
-@Html.ValidationSummary()
-<form method="post">
-    <fieldset>
-        <legend>Ticket Informatie</legend>
-        <p>
-            <img src="@photo" alt="Foto" height="50" widht="50" />
-        </p>
-
-        @if (useVideo)
-        {
+<div id="body" class="container">
+    <h2 class="toptext">@name</h2>
+    <p class="ondertekst"><b>Met:</b> @artist &#9;&#9;<b>Prijs:</b> &euro;@price &#9;&#9; <b>Wanneer:</b> @date.ToString("dddd", ci) @date.Day @date.ToString("MMMM", ci) @date.Year</p>
+    <hr />
+    @Html.ValidationSummary()
+    <div class="row">
+        <div class="col-md-6" id="optreden">
             <p>
-                <iframe id="ytplayer" type="text/html" width="640" height="360"
-                        src="https://www.youtube.com/embed/@videoID?autoplay=0"
-                        frameborder="0"></iframe>
+                <img src="@photo" alt="Foto" />
             </p>
-        }
+            <button class="btn btn-default" style="width:100%" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                <b>Meer informatie</b>
+            </button>
+            <div class="collapse" id="collapseExample">
+                <div class="card card-block">
+                    <p id="beschrijving">@description</p>
+                    @if (useVideo)
+                    {
+                        <div class="intrinsic-container">
+                            <iframe id="ytplayer" type="text/html" src="https://www.youtube.com/embed/@videoID?autoplay=0" allowfullscreen frameborder="0"></iframe>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6" id="optreden">
+            <h3 class="text-center">Tickets kopen</h3>
+            <hr />
+            <form method="post">
+                <fieldset>
+                    <legend>Uw gegevens:</legend>
+                    @*<p>
+                        <label for="email">Uw e-mailadres</label>
+                        <input type="email" class="form-control" name="email" value="@Request.Form["email"]" required />
+                        @Html.ValidationMessage("email")
+                    </p>*@
+                    <p>
+                        <label for="numberOfTickets">Aantal reguliere tickets</label>
+                        <div class="input-group">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default value-control" type="button" data-action="minus" data-target="regtick"><i class="fa fa-minus fa-lg" aria-hidden="true"></i></button>
+                            </span>
+                            <input name="numberOfTickets" type="number" class="form-control no-padding add-color text-center height-25" id="regtick" maxlength="3" value="0" required>
+                            <span class="input-group-btn">
+                                <button class="btn btn-default value-control" type="button" data-action="plus" data-target="regtick"><i class="fa fa-plus fa-lg" aria-hidden="true"></i></button>
+                            </span>
+                        </div>
+                        @Html.ValidationMessage("numberOfTickets")
+                    </p>
 
-        <p>
-            <label for="name">Concert naam:</label>
-            <input type="text" name="name" value="@name" readonly />
-        </p>
+                    <p>
+                        <label for="numberOfDiscountTickets">Tickets met korting*</label>
+                        <div class="input-group">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default value-control" type="button" data-action="minus" data-target="distick"><i class="fa fa-minus fa-lg" aria-hidden="true"></i></button>
+                            </span>
+                            <input name="numberOfDiscountTickets" type="number" class="form-control no-padding add-color text-center height-25" id="distick" maxlength="3" value="0" required>
+                            <span class="input-group-btn">
+                                <button class="btn btn-default value-control" type="button" data-action="plus" data-target="distick"><i class="fa fa-plus fa-lg" aria-hidden="true"></i></button>
+                            </span>
+                        </div>
+                        @Html.ValidationMessage("numberOfDiscountTickets")
+                    </p>
 
-        <p>
-            <label for="artist">Artiest:</label>
-            <input type="text" name="artist" value="@artist" readonly />
-        </p>
+                    <input type="hidden" name="concertId" value="@concertId" />
 
-        <p>
-            <label for="description">Beschrijving:</label>
-            <textarea name="description" rows="4" cols="50" readonly>@description</textarea>
-        </p>
+                    <p>
+                        <input type="submit" style="width:100%" class="btn btn-danger" value="Tickets toevoegen" />
+                    </p>
 
-        <p>
-            <label for="price">Prijs</label>
-            <input type="text" name="price" value="&euro;@price" readonly />
-        </p>
-
-        <p>
-            <label for="date">Datum en tijd:</label>
-            <input type="text" name="date" value="@date" readonly />
-        </p>
-
-        <input type="hidden" name="concertId" value="@concertId" />
-
-    </fieldset>
-
-    <fieldset>
-        <legend>Uw gegevens:</legend>
-        <p>
-            <label for="numberOfTickets">Aantal reguliere tickets</label>
-            <input type="number" name="numberOfTickets" min="0" value="@Request.Form["numberOfTickets"]" required />
-            @Html.ValidationMessage("numberOfTickets")
-        </p>
-
-        <p>
-            <label for="numberOfDiscountTickets">Tickets met korting *</label>
-            <input type="number" name="numberOfDiscountTickets" min="0" value="@Request.Form["numberOfDiscountTickets"]" required />
-            @Html.ValidationMessage("numberOfDiscountTickets")
-        </p>
-
-        <p>
-            <input type="submit" value="Tickets toevoegen" />
-        </p>
-
-        <p>
-            * Alleen voor kinderen onder de 16 jaar en 65-plussers
-        </p>
-    </fieldset>
-</form>
+                    <p>
+                        * Alleen voor kinderen onder de 16 jaar en 65-plussers
+                    </p>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+</div>

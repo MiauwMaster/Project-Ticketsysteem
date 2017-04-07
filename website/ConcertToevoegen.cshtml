@@ -52,68 +52,79 @@
         }
     }
 }
-<h2>Concert toevoegen</h2>
-@Html.ValidationSummary()
-<form method="post" enctype="multipart/form-data">
-    <fieldset>
-        <legend>Concert informatie</legend>
-        <p>
-            <label for="name">Concert naam:</label>
-            <input type="text" name="name" value="@Request.Form["name"]" required />
-            @Html.ValidationMessage("name")
-        </p>
+<div class="container" id="body">
+    <h2 class="toptext">Concert toevoegen</h2>
+    <hr />
+    @Html.ValidationSummary()
+    <form method="post" enctype="multipart/form-data">
+        <fieldset>
+            <legend>Concert informatie</legend>
+            <p class="centertext"><label for="name">Concert naam:</label></p>
+            <p class="centertext">
+                <input type="text" name="name" value="@Request.Form["name"]" required />
+                @Html.ValidationMessage("name")
+            </p>
+            <br />
 
-        <p>
-            <label for="artist">Artiest:</label>
-            <input type="text" name="artist" value="@Request.Form["artist"]" required  />
-            @Html.ValidationMessage("artist")
-        </p>
+            <p class="centertext"><label for="artist">Artiest:</label></p>
+            <p class="centertext">
+                <input type="text" name="artist" value="@Request.Form["artist"]" required />
+                @Html.ValidationMessage("artist")
+            </p>
+            <br />
 
-        <p>
-            <label for="description">Beschrijving:</label>
-            <textarea name="description" rows="4" cols="50" required>@Request.Form["description"]</textarea>
-            @Html.ValidationMessage("description")
-        </p>
+            <p class="centertext"><label for="description">Beschrijving:</label></p>
+            <p class="centertext">
+                <textarea name="description" rows="4" cols="50" required>@Request.Form["description"]</textarea>
+                @Html.ValidationMessage("description")
+            </p>
+            <br />
 
-        <p>
-            <label for="price">Prijs:</label>
-            <input type="number" name="price" step="0.01" min="0.01" max="99" value="@Request.Form["price"]" required />
-            @Html.ValidationMessage("price")
-        </p>
+            <p class="centertext"><label for="price">Prijs (in euro's):</label></p>
+            <p class="centertext">
+                <input type="number" name="price" step="0.01" min="0.01" max="99" value="@Request.Form["price"]" required />
+                @Html.ValidationMessage("price")
+            </p>
+            <br />
 
-        <p>
-            <label for="theater">Zaal:</label>
-            <select name="theater" required>
-                @foreach(var item in db.Query("SELECT * FROM Zalen"))
-                {
-                    <option value="@item.zaal_nr">Zaal @item.zaal_nr: @item.aantal_plekken plekken</option>
-                }
-            </select>
-            @Html.ValidationMessage("theater")
-        </p>
+            <p class="centertext">
+                <label for="theater">Zaal:</label>
+                <select name="theater" required>
+                    @foreach (var item in db.Query("SELECT * FROM Zalen"))
+                    {
+                        <option value="@item.zaal_nr">Zaal @item.zaal_nr: @item.aantal_plekken plekken</option>
+                    }
+                </select>
+                @Html.ValidationMessage("theater")
+            </p>
+            <br />
 
-        <p>
-            <label for="date">Datum en tijd:</label>
-            <input type="datetime-local" name="date" value="@Request.Form["date"]" required />
-            @Html.ValidationMessage("date")
-        </p>
+            <p class="centertext"><label for="date">Datum en tijd:</label></p>
+            <p class="centertext">
+                <input type="datetime-local" name="date" value="@Request.Form["date"]" required />
+                @Html.ValidationMessage("date")
+            </p>
+            <br />
 
-        <p>
-            <label for="photo">Foto:</label>
-            <input type="file" name="photo" value="@Request.Form["photo"]" accept="image/*" required />
-        </p>
+            <p class="centertext"><label for="photo">Foto:</label></p>
+            <p class="centertext">
+                <input type="file" name="photo" value="@Request.Form["photo"]" accept="image/*" required />
+            </p>
+            <br />
 
-        <p>
-            <label for="video">YouTube Video URL (optioneel)</label>
-            <input type="text" name="video" value="@Request.Form["video"]" />
-            @Html.ValidationMessage("video")
-        </p>
-
-        <p>
-            <input type="submit" value="Concert toevoegen" />
-        </p>
-    </fieldset>
-</form>
-<p>
-    <a href="~/Beheer.cshtml">Terug naar beher</a>
-</p>
+            <p class="centertext"><label for="video">YouTube Video URL (optioneel)</label></p>
+            <p class="centertext">
+                <input type="text" name="video" value="@Request.Form["video"]" />
+                @Html.ValidationMessage("video")
+            </p>
+            <br />
+            <p class="centertext">
+                <input type="submit" class="btn btn-danger" value="Concert toevoegen" />
+            </p>
+        </fieldset>
+    </form>
+    <br />
+    <p class="centertext">
+        <a href="~/Beheer.cshtml" class="btn btn-danger"><i class="fa fa-arrow-left"></i> Terug naar beheer</a>
+    </p>
+</div>
