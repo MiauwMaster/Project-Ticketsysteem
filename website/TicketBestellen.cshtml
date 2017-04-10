@@ -7,6 +7,8 @@
     System.Globalization.CultureInfo ci = new System.Globalization.CultureInfo("nl-NL");
 
     // Variables
+    var data = 0;
+    var zaal = 0;
     var concertId = 0;
     var name = "";
     var artist = "";
@@ -17,23 +19,22 @@
     var video = "";
     var useVideo = false;
     var videoID = "";
+    string message = "";
+
+    var statement = "SELECT * FROM Concerten WHERE id = @0";
+    var row = db.QuerySingle(statement, Convert.ToInt32(Request.QueryString["id"]));
+
+    var statement2 = ("SELECT COUNT(*) FROM Tickets WHERE concertId = @0");
+    data = db.QueryValue(statement2, Convert.ToInt32(Request.QueryString["id"]));
+
+    var statement3 = ("SELECT aantal_plekken FROM Zalen WHERE zaal_nr = @0");
+    zaal = db.QueryValue(statement3, row.zaal_nr);
 
     if (!IsPost)
     {
         if (!Request.QueryString["id"].IsEmpty() && Request.QueryString["id"].IsInt())
         {
             // Concert ID from query string (GET value)
-            concertId = Convert.ToInt32(Request.QueryString["id"]);
-
-            // SQL statement
-            var statement = "SELECT * FROM Concerten WHERE id = @0";
-            var row = db.QuerySingle(statement, concertId);
-
-            var statement2("SELECT COUNT(*) FROM Tickets WHERE concertId = @0");
-            var data = db.QuerySingle(statement2, concertId);
-
-            var statement3("SELECT aantal_plekken FROM Zalen WHERE zaal_nr = @0");
-            var zaal = db.QuerySingle(statement3, row.zaal_nr);
 
             if (row != null)
             {
@@ -82,33 +83,38 @@
 
         if (Validation.IsValid())
         {
-            // List of current tickets
-            List<Ticket> cart = new List<Ticket>();
-
-            if (Session["cart"] != null)
+            if ((numberOfDiscountTickets + numberOfTickets) > (zaal - data))
             {
-                cart = (List<Ticket>)Session["cart"];
+                Response.Redirect("~/Concerten.cshtml");
             }
 
-            // Add regular tickets to cart
-            for (int i = 0; i < numberOfTickets; i++)
-            {
-                Ticket ticket = new Ticket(concertId, false);
-                cart.Add(ticket);
+            else {
+                // List of current tickets
+                List<Ticket> cart = new List<Ticket>();
+
+                if (Session["cart"] != null)
+                {
+                    cart = (List<Ticket>)Session["cart"];
+                }
+
+                // Add regular tickets to cart
+                for (int i = 0; i < numberOfTickets; i++)
+                {
+                    Ticket ticket = new Ticket(concertId, false);
+                    cart.Add(ticket);
+                }
+
+                // Add discount tickets to cart
+                for (int i = 0; i < numberOfDiscountTickets; i++)
+                {
+                    Ticket ticket = new Ticket(concertId, true);
+                    cart.Add(ticket);
+                }
+
+                // Store list of tickets in cart
+                Session["cart"] = cart;
+                Response.Redirect("~/Winkelwagen.cshtml");
             }
-
-            // Add discount tickets to cart
-            for (int i = 0; i < numberOfDiscountTickets; i++)
-            {
-                Ticket ticket = new Ticket(concertId, true);
-                cart.Add(ticket);
-            }
-
-            // Store list of tickets in cart
-            Session["cart"] = cart;
-
-            // Redirect to cart
-            Response.Redirect("~/Winkelwagen.cshtml");
         }
     }
 }
@@ -191,6 +197,7 @@
 
                     <p>
                         * Alleen voor kinderen onder de 16 jaar en 65-plussers
+                        @message
                     </p>
                 </fieldset>
             </form>
