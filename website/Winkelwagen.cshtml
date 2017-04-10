@@ -82,8 +82,19 @@
 
                 // Redirect to payment page with bestelNr in the request
                 // bestelNr makes it possible to retrieve all tickets linked to this bestelling
-                Response.Redirect("~/Betalen.cshtml?id=" + bestelNr);
+                if (!WebSecurity.IsAuthenticated)
+                {
+                    Response.Redirect("~/Betalen.cshtml?id=" + bestelNr);
+                }
+
+                else
+                {
+                    var betaalStatement = "UPDATE Bestellingen SET betaald = 1 WHERE id = @0";
+                    db.Execute(betaalStatement, bestelNr);
+                    Response.Redirect("~/TicketGenereren.cshtml?id=" + bestelNr);
+                }
             }
+
             else
             {
                 Validation.AddFormError("Winkelwagen is leeg.");
