@@ -249,3 +249,8 @@ paket-files/
 # JetBrains Rider
 .idea/
 *.sln.iml
+
+# Web and Package Config
+website/Web.config
+website/Web.Debug.config
+website/packages.config
