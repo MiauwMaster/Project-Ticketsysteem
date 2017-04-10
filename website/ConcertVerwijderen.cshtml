@@ -1,0 +1,126 @@
+﻿@{
+    Page.Title = "Concert Verwijderen";
+    Layout = "_SiteLayout.cshtml";
+
+    // Authentication
+    if (!WebSecurity.IsAuthenticated)
+    {
+        Response.Redirect("~/BeheerLogin.cshtml");
+    }
+
+    // Open database connection
+    var db = Database.Open("Database");
+
+    // Variables
+    var concertId = 0;
+    var name = "";
+    var artist = "";
+    var description = "";
+    var price = Decimal.One;
+    var date = DateTime.Now;
+
+    // GET request
+    if (!IsPost)
+    {
+        if (!Request.QueryString["id"].IsEmpty() && Request.QueryString["id"].IsInt())
+        {
+            concertId = Convert.ToInt32(Request.QueryString["id"]);
+
+            var statement = "SELECT * FROM Concerten WHERE id = @0";
+            var row = db.QuerySingle(statement, concertId);
+
+            if (row != null)
+            {
+                name = row.naam;
+                artist = row.artiest;
+                description = row.beschrijving;
+                price = row.prijs;
+                date = row.datum;
+            }
+            else
+            {
+                Validation.AddFormError("Geen concert geselecteerd.");
+            }
+        }
+        else
+        {
+            Validation.AddFormError("Geen concert geselecteerd.");
+        }
+    }
+
+    // POST request
+    if (IsPost)
+    {
+        if (Validation.IsValid())
+        {
+            // POST values
+            concertId = Convert.ToInt32(Request.Form["concertId"]);
+
+            // SQL statement
+            var statement = "DELETE FROM Concerten WHERE id = @0";
+            db.Execute(statement, concertId);
+
+            // Redirect to administration page
+            Response.Redirect("~/Beheer.cshtml");
+        }
+    }
+}
+<div class="container" id="body">
+    <h2 class="toptext">Concert verwijderen</h2>
+    <hr />
+    <div class="row">
+        <div class="col-lg-3"></div>
+        <div class="col-lg-6">
+            @Html.ValidationSummary()
+            <form method="post">
+                <fieldset>
+                    <legend>Concert Informatie</legend>
+                    <p class="centertext">
+                        <label for="name">Concert naam:</label>
+                    </p>
+                    <p class="centertext">
+                        @name
+                    </p>
+                    <br />
+                    <p class="centertext">
+                        <label for="artist">Artiest:</label>
+                    </p>
+                    <p class="centertext">
+                        @artist
+                    </p>
+                    <br />
+                    <p class="centertext">
+                        <label for="description">Beschrijving:</label>
+                    </p>
+                    <p class="centertext">
+                        @description
+                    </p>
+                    <br />
+                    <p class="centertext">
+                        <label for="price">Prijs:</label>
+                    </p>
+                    <p class="centertext">
+                        @price"
+                    </p>
+                    <br />
+                    <p class="centertext">
+                        <label for="date">Datum:</label>
+                    </p>
+                    <p class="centertext">
+                        @date
+                    </p>
+                    <br />
+                    <input type="hidden" name="concertId" value="@concertId" />
+                    <p class="centertext">
+                        <input type="submit" class="btn btn-danger" value="Verwijder Concert" />
+                    </p>
+                </fieldset>
+            </form>
+            <br />
+            <p class="centertext">
+                <a href="~/Beheer.cshtml" class="btn btn-danger"><i class="fa fa-arrow-left"></i> Terug naar beheer</a>
+            </p>
+        </div>
+        <div class="col-lg-3"></div>
+    </div>
+</div>

@@ -20,7 +20,7 @@
     System.Globalization.CultureInfo ci = new System.Globalization.CultureInfo("nl-NL");
 
     // SQL statement for concerts
-    var statement = "SELECT * FROM Concerten";
+    var statement = "SELECT * FROM Concerten ORDER BY datum DESC";
     var dataConcerten = db.Query(statement);
 
     // Create a table (WebGrid) with coming concerts
@@ -107,7 +107,7 @@
             <div class="panel-heading">
                 <div class="row">
                     <div class="col col-xs-6">
-                        <h3 class="panel-title">Aankomende concerten</h3>
+                        <h3 class="panel-title">Concerten</h3>
                     </div>
                     <div class="col col-xs-6 text-right">
                         <a href="~/ConcertToevoegen.cshtml" class="btn btn-sm btn-danger btn-create">Nieuw concert</a>
