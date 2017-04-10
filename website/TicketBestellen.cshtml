@@ -29,6 +29,12 @@
             var statement = "SELECT * FROM Concerten WHERE id = @0";
             var row = db.QuerySingle(statement, concertId);
 
+            var statement2("SELECT COUNT(*) FROM Tickets WHERE concertId = @0");
+            var data = db.QuerySingle(statement2, concertId);
+
+            var statement3("SELECT aantal_plekken FROM Zalen WHERE zaal_nr = @0");
+            var zaal = db.QuerySingle(statement3, row.zaal_nr);
+
             if (row != null)
             {
                 name = row.naam;
@@ -173,7 +179,14 @@
                     <input type="hidden" name="concertId" value="@concertId" />
 
                     <p>
+                        @if(data < zaal)
+                        {
                         <input type="submit" style="width:100%" class="btn btn-danger" value="Tickets toevoegen" />
+                        }
+                        else
+                        {
+                         <input type="submit" style="width:100%" class="btn btn-danger" value="UITVERKOCHT" disabled />
+                        }
                     </p>
 
                     <p>
