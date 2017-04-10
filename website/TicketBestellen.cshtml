@@ -29,11 +29,11 @@
             var statement = "SELECT * FROM Concerten WHERE id = @0";
             var row = db.QuerySingle(statement, concertId);
 
-            var statement2("SELECT COUNT(*) FROM Tickets WHERE concertId = @0");
-            var data = db.QuerySingle(statement2, concertId);
+            var statement2 = ("SELECT COUNT(*) FROM Tickets WHERE concertId = @0");
+            var data = db.QueryValue(statement2, concertId);
 
-            var statement3("SELECT aantal_plekken FROM Zalen WHERE zaal_nr = @0");
-            var zaal = db.QuerySingle(statement3, row.zaal_nr);
+            var statement3 = ("SELECT aantal_plekken FROM Zalen WHERE zaal_nr = @0");
+            var zaal = db.QueryValue(statement3, row.zaal_nr);
 
             if (row != null)
             {
