@@ -6,6 +6,8 @@
     var db = Database.Open("Database");
     System.Globalization.CultureInfo ci = new System.Globalization.CultureInfo("nl-NL");
 
+
+
     // Variables
     var concertId = 0;
     var name = "";
@@ -18,6 +20,9 @@
     var useVideo = false;
     var videoID = "";
 
+    var data = 0;
+    var zaal = 0;
+
     if (!IsPost)
     {
         if (!Request.QueryString["id"].IsEmpty() && Request.QueryString["id"].IsInt())
@@ -29,11 +34,11 @@
             var statement = "SELECT * FROM Concerten WHERE id = @0";
             var row = db.QuerySingle(statement, concertId);
 
-            var statement2("SELECT COUNT(*) FROM Tickets WHERE concertId = @0");
-            var data = db.QuerySingle(statement2, concertId);
+            var statement2 = "SELECT COUNT(*) FROM Tickets WHERE concertId = @0";
+            data = db.QueryValue(statement2, concertId);
 
-            var statement3("SELECT aantal_plekken FROM Zalen WHERE zaal_nr = @0");
-            var zaal = db.QuerySingle(statement3, row.zaal_nr);
+            var statement3 = "SELECT aantal_plekken FROM Zalen WHERE zaal_nr = @0";
+            zaal = db.QueryValue(statement3, row.zaal_nr);
 
             if (row != null)
             {
@@ -80,35 +85,52 @@
         var numberOfTickets = Convert.ToInt32(Request.Form["numberOfTickets"]);
         var numberOfDiscountTickets = Convert.ToInt32(Request.Form["numberOfDiscountTickets"]);
 
-        if (Validation.IsValid())
+        // SQL statement
+        var statement = "SELECT * FROM Concerten WHERE id = @0";
+        var row = db.QuerySingle(statement, concertId);
+
+        var statement2 = "SELECT COUNT(*) FROM Tickets WHERE concertId = @0";
+        data = db.QueryValue(statement2, concertId);
+
+        var statement3 = "SELECT aantal_plekken FROM Zalen WHERE zaal_nr = @0";
+        zaal = db.QueryValue(statement3, row.zaal_nr);
+
+        if (numberOfTickets + numberOfDiscountTickets <= zaal - data)
         {
-            // List of current tickets
-            List<Ticket> cart = new List<Ticket>();
-
-            if (Session["cart"] != null)
+            if (Validation.IsValid())
             {
-                cart = (List<Ticket>)Session["cart"];
+                // List of current tickets
+                List<Ticket> cart = new List<Ticket>();
+
+                if (Session["cart"] != null)
+                {
+                    cart = (List<Ticket>)Session["cart"];
+                }
+
+                // Add regular tickets to cart
+                for (int i = 0; i < numberOfTickets; i++)
+                {
+                    Ticket ticket = new Ticket(concertId, false);
+                    cart.Add(ticket);
+                }
+
+                // Add discount tickets to cart
+                for (int i = 0; i < numberOfDiscountTickets; i++)
+                {
+                    Ticket ticket = new Ticket(concertId, true);
+                    cart.Add(ticket);
+                }
+
+                // Store list of tickets in cart
+                Session["cart"] = cart;
+
+                // Redirect to cart
+                Response.Redirect("~/Winkelwagen.cshtml");
             }
-
-            // Add regular tickets to cart
-            for (int i = 0; i < numberOfTickets; i++)
-            {
-                Ticket ticket = new Ticket(concertId, false);
-                cart.Add(ticket);
-            }
-
-            // Add discount tickets to cart
-            for (int i = 0; i < numberOfDiscountTickets; i++)
-            {
-                Ticket ticket = new Ticket(concertId, true);
-                cart.Add(ticket);
-            }
-
-            // Store list of tickets in cart
-            Session["cart"] = cart;
-
-            // Redirect to cart
-            Response.Redirect("~/Winkelwagen.cshtml");
+        }
+        else
+        {
+            Validation.AddFormError("U kunt niet meer tickets bestellen dan er beschikbaar zijn");
         }
     }
 }
