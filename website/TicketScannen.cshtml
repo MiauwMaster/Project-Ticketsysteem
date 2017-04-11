@@ -10,51 +10,57 @@
     var isBetaald = false;
     var message = "Ticket niet gescand";
 
-
-    if (!Request.QueryString["id"].IsEmpty() && Request.QueryString["id"].IsInt())
+    if (WebSecurity.IsAuthenticated)
     {
-        //Read URL
-        ticketID = Convert.ToInt32(Request.QueryString["id"]);
-        message = "Ticket is gelezen";
-
-        //SQL
-        var statement = "SELECT bestel_nr FROM Tickets WHERE id = @0";
-        var data = db.QueryValue(statement, ticketID);
-
-        var statement2 = "SELECT * FROM Bestellingen WHERE id = @0";
-        var data2 = db.QuerySingle(statement2, data);
-
-        var statement3 = "SELECT gebruikt FROM Tickets WHERE id = @0";
-        var data3 = db.QueryValue(statement3, ticketID);
-
-        if (data2 != null)
+        if (!Request.QueryString["id"].IsEmpty() && Request.QueryString["id"].IsInt())
         {
-            //Check payment status
-            isBetaald = data2.betaald;
-            if (isBetaald == false)
-            {
-                message = "Ticket is nog niet betaald";
-            }
-            else if (isBetaald == true)
-            {
-                // Check if ticket is already used
-                if (data3 == true)
-                {
-                    message = "Ticket is al gebruikt!";
-                }
+            //Read URL
+            ticketID = Convert.ToInt32(Request.QueryString["id"]);
+            message = "Ticket is gelezen";
 
-                //Set ticket used
-                else
-                {
-                    message = "Ticket is betaald en ingescand. Veel plezier bij het concert!";
-                    db.Execute("UPDATE Tickets SET gebruikt = 1 WHERE id = @0", ticketID);
-                }
+            //SQL
+            var statement = "SELECT bestel_nr FROM Tickets WHERE id = @0";
+            var data = db.QueryValue(statement, ticketID);
 
+            var statement2 = "SELECT * FROM Bestellingen WHERE id = @0";
+            var data2 = db.QuerySingle(statement2, data);
+
+            var statement3 = "SELECT gebruikt FROM Tickets WHERE id = @0";
+            var data3 = db.QueryValue(statement3, ticketID);
+
+            if (data2 != null)
+            {
+                //Check payment status
+                isBetaald = data2.betaald;
+                if (isBetaald == false)
+                {
+                    message = "Ticket is nog niet betaald";
+                }
+                else if (isBetaald == true)
+                {
+                    // Check if ticket is already used
+                    if (data3 == true)
+                    {
+                        message = "Ticket is al gebruikt!";
+                    }
+
+                    //Set ticket used
+                    else
+                    {
+                        message = "Ticket is betaald en ingescand. Veel plezier bij het concert!";
+                        db.Execute("UPDATE Tickets SET gebruikt = 1 WHERE id = @0", ticketID);
+                    }
+
+                }
             }
         }
     }
+    else
+    {
+        Response.Redirect("~/BeheerLogin.cshtml");
+    }
 
 }
-
+<p>@Html.ValidationSummary()</p>
 <p>Ticket betaald: @isBetaald</p>
 <p>@message</p>
