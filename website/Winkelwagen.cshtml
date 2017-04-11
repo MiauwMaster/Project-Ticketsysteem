@@ -58,10 +58,6 @@
                     // POST request values
                     var email = Request.Form["email"];
 
-<<<<<<< HEAD
-                    // SQL statement for bestelling insertion (betaald attribute of bestelling is by default FALSE)
-                    var statementBestelling = "INSERT INTO Bestellingen (email) VALUES (@0)";
-=======
                 if (WebSecurity.IsAuthenticated)
                 {
                     email = "ticketsysteem@nhl.nl";
@@ -69,7 +65,6 @@
 
                 // SQL statement for bestelling insertion (betaald attribute of bestelling is by default FALSE)
                 var statementBestelling = "INSERT INTO Bestellingen (email) VALUES (@0)";
->>>>>>> 019f76cb62c12e7ff25edcf36f35272ac1afe8f3
 
                     // Insert new bestelling into database
                     db.Execute(statementBestelling, email);

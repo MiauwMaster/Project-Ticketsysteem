@@ -147,7 +147,7 @@
                                     @item.Artiest
                                 </td>
                                 <td>
-                                    &euro;@item.Prijs
+                                    @item.Prijs.ToString("c")
                                 </td>
                                 <td align="center">
                                     <a href="~/ConcertInfo.cshtml?id=@item.ID" class="btn btn-secondary"><i class="fa fa-info"></i></a>
