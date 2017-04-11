@@ -41,7 +41,10 @@
     }
 
     // Validation
-    Validation.RequireFields("email");
+    if (!WebSecurity.IsAuthenticated)
+    {
+        Validation.RequireFields("email");
+    }
 
     // POST request
     if (IsPost)
@@ -55,8 +58,18 @@
                     // POST request values
                     var email = Request.Form["email"];
 
+<<<<<<< HEAD
                     // SQL statement for bestelling insertion (betaald attribute of bestelling is by default FALSE)
                     var statementBestelling = "INSERT INTO Bestellingen (email) VALUES (@0)";
+=======
+                if (WebSecurity.IsAuthenticated)
+                {
+                    email = "ticketsysteem@nhl.nl";
+                }
+
+                // SQL statement for bestelling insertion (betaald attribute of bestelling is by default FALSE)
+                var statementBestelling = "INSERT INTO Bestellingen (email) VALUES (@0)";
+>>>>>>> 019f76cb62c12e7ff25edcf36f35272ac1afe8f3
 
                     // Insert new bestelling into database
                     db.Execute(statementBestelling, email);
@@ -278,8 +291,12 @@
                     <div class="col-md-6">
                         <form method="post">
                             <p>
+                                @if (!WebSecurity.IsAuthenticated)
+                                {
                                 <label class="centertext" for="email">Uw e-mailadres:</label>
+                               
                                 <input type="text" name="email" value="@Request.Form["email"]" class="btn-block" required />
+                                }
                                 @Html.ValidationMessage("email")
                             </p>
                             <p>
