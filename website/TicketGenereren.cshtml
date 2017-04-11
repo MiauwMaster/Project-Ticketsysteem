@@ -76,7 +76,7 @@
         Image jpg = Image.GetInstance(qrCodeImage, BaseColor.WHITE);
 
         // print rest of ticket info
-        var datump = new Phrase(@"Datum: " + datum.ToString("dd MMMM, yyyy"), parFont);
+        var datump = new Phrase(@"Datum: " + datum.ToString("dd MMMM, yyyy HH:mm"), parFont);
         var zaalp = new Phrase("Zaal: " + zaal.ToString(), parFont);
 
         //Checken op korting
@@ -128,9 +128,12 @@
 
         doc.Add(table);
 
-        Paragraph email = new Paragraph("Dit ticket is ook verstuurd naar het emailadres: " + userEmail.ToString(), parFont);
-        email.Alignment = Element.ALIGN_CENTER;
-        doc.Add(email);
+        if (!WebSecurity.IsAuthenticated)
+        {
+            Paragraph email = new Paragraph("Dit ticket is ook verstuurd naar het emailadres: " + userEmail.ToString(), parFont);
+            email.Alignment = Element.ALIGN_CENTER;
+            doc.Add(email);
+        }
     }
 
     doc.Close();
