@@ -86,13 +86,14 @@
         Phrase prijsp = new Phrase();
         if (korting == false)
         {
-            prijsp = new Phrase("Prijs: \u20AC" + prijs.ToString(), parFont);
+            prijsp = new Phrase("Prijs: \u20AC" + string.Format("{0:0.00}", prijs), parFont);
         }
 
         else if (korting == true)
         {
             decimal prijsMetKorting = prijs * 0.9m;
-            prijsp = new Phrase("Prijs: \u20AC" + prijsMetKorting.ToString(), parFont);
+            prijsp = new Phrase("Prijs: \u20AC" + string.Format("{0:0.00}", prijsMetKorting), parFont);
+            
         }
 
         // Add artist photo
