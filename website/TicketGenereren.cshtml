@@ -76,7 +76,7 @@
         Image jpg = Image.GetInstance(qrCodeImage, BaseColor.WHITE);
 
         // print rest of ticket info
-        var datump = new Phrase(@"Datum: " + datum.ToString("dd MMMM, yyyy"), parFont);
+        var datump = new Phrase(@"Datum: " + datum.ToString("dd MMMM, yyyy HH:mm"), parFont);
         var zaalp = new Phrase("Zaal: " + zaal.ToString(), parFont);
 
         //Checken op korting
@@ -128,9 +128,12 @@
 
         doc.Add(table);
 
-        Paragraph email = new Paragraph("Dit ticket is ook verstuurd naar het emailadres: " + userEmail.ToString(), parFont);
-        email.Alignment = Element.ALIGN_CENTER;
-        doc.Add(email);
+        if (!WebSecurity.IsAuthenticated)
+        {
+            Paragraph email = new Paragraph("Dit ticket is ook verstuurd naar het emailadres: " + userEmail.ToString(), parFont);
+            email.Alignment = Element.ALIGN_CENTER;
+            doc.Add(email);
+        }
     }
 
     doc.Close();
@@ -146,21 +149,24 @@
     Response.WriteFile(filePath);
 
     //Send mail
-    MailAddress mailfrom = new MailAddress("ticketsysteemnhl@gmail.com");
-    MailAddress mailto = new MailAddress(userEmail.ToString());
-    MailMessage newmsg = new MailMessage(mailfrom, mailto);
+    if (userEmail != "ticketsysteemnhl@gmail.com")
+    {
+        MailAddress mailfrom = new MailAddress("ticketsysteemnhl@gmail.com");
+        MailAddress mailto = new MailAddress(userEmail.ToString());
+        MailMessage newmsg = new MailMessage(mailfrom, mailto);
 
-    newmsg.Subject = "Uw Ticket(s)";
-    newmsg.Body = "Hartelijk bedankt voor het bestellen. In de bijlage vind u een pdf met uw ticket(s), deze dient u te printen en te laten zien bij binnenkomst.";
+        newmsg.Subject = "Uw Ticket(s)";
+        newmsg.Body = "Hartelijk bedankt voor het bestellen. In de bijlage vind u een pdf met uw ticket(s), deze dient u te printen en te laten zien bij binnenkomst.";
 
-    //Ticket attachment
-    Attachment att = new Attachment(Server.MapPath("Tickets") + "\\" + bestelNR + rand + ".pdf");
-    newmsg.Attachments.Add(att);
+        //Ticket attachment
+        Attachment att = new Attachment(Server.MapPath("Tickets") + "\\" + bestelNR + rand + ".pdf");
+        newmsg.Attachments.Add(att);
 
-    //SMTP server info
-    SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587);
-    smtp.UseDefaultCredentials = false;
-    smtp.Credentials = new NetworkCredential("ticketsysteemnhl@gmail.com", "waltersamplonius");
-    smtp.EnableSsl = true;
-    smtp.Send(newmsg);
+        //SMTP server info
+        SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587);
+        smtp.UseDefaultCredentials = false;
+        smtp.Credentials = new NetworkCredential("ticketsysteemnhl@gmail.com", "waltersamplonius");
+        smtp.EnableSsl = true;
+        smtp.Send(newmsg);
+    }
 }
