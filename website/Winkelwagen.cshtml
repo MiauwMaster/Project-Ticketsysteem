@@ -40,26 +40,98 @@
         }
     }
 
-    // Read POST form values
-    if (!Request["refreshButton"].IsEmpty())
+    // Validation
+    Validation.RequireFields("email");
+
+    // POST request
+    if (IsPost)
     {
-        foreach (var concert in concertenRow)
+        if (!Request["buttonBetalen"].IsEmpty())
         {
-            var concertId = concert.id;
-            cart.RemoveAll(Ticket => Ticket.Concert == concertId);
-            var numberOfDiscountTickets = Convert.ToInt32(Request.Form["numberOfDiscountTickets?id="+concertId]);
-            var numberOfTickets = Convert.ToInt32(Request.Form["numberOfTickets?id="+concertId]);
-
-            for (int i = 0; i < numberOfTickets; i++)
+            if (Validation.IsValid())
             {
-                Ticket ticket = new Ticket(concertId, false);
-                cart.Add(ticket);
+                if (cart.Any())
+                {
+                    // POST request values
+                    var email = Request.Form["email"];
+
+                    // SQL statement for bestelling insertion (betaald attribute of bestelling is by default FALSE)
+                    var statementBestelling = "INSERT INTO Bestellingen (email) VALUES (@0)";
+
+                    // Insert new bestelling into database
+                    db.Execute(statementBestelling, email);
+
+                    // Fetch bestelNr (unique ID) from database
+                    var bestelNr = Convert.ToInt32(db.QueryValue("SELECT @@IDENTITY")); // // @@IDENTITY retrieves last auto generated id (auto_incremented) of this (current) connection
+
+                    // SQL statement for ticket insertion
+                    var statementTicket = "INSERT INTO Tickets (kindOf65plus, concertId, bestel_nr) VALUES (@0, @1, @2)";
+
+                    // Loop through cart, add each ticket with it attributes to the database:
+                    // linked to the bestelling created earlier, which is still unpaid: which
+                    // makes the tickets invalid for now!!!
+                    foreach (Ticket ticket in cart)
+                    {
+                        // Check if this is a discount ticket
+                        if (ticket.Korting)
+                        {
+                            db.Execute(statementTicket, 1, ticket.Concert, bestelNr);
+                        }
+                        else
+                        {
+                            db.Execute(statementTicket, 0, ticket.Concert, bestelNr);
+                        }
+                    }
+
+                    // Remove everything from cart (session) and abandon session
+                    Session.RemoveAll();
+                    Session.Abandon();
+
+                    // Redirect to payment page with bestelNr in the request
+                    // bestelNr makes it possible to retrieve all tickets linked to this bestelling
+                    if (!WebSecurity.IsAuthenticated)
+                    {
+                        Response.Redirect("~/Betalen.cshtml?id=" + bestelNr);
+                    }
+
+                    else
+                    {
+                        var betaalStatement = "UPDATE Bestellingen SET betaald = 1 WHERE id = @0";
+                        db.Execute(betaalStatement, bestelNr);
+                        Response.Redirect("~/TicketGenereren.cshtml?id=" + bestelNr);
+                    }
+                }
+
+                else
+                {
+                    Validation.AddFormError("Winkelwagen is leeg.");
+                }
             }
+        }
 
-            // Add discount tickets to cart
-            for (int i = 0; i < numberOfDiscountTickets; i++)
+        if (!Request["deleteButton"].IsEmpty())
+        {
+            int concertId = Convert.ToInt16(Request.Form["concertId"]);
+            bool korting = Convert.ToBoolean(Request.Form["korting"]);
+            cart.RemoveAll(Ticket => (Ticket.Concert == concertId && Ticket.Korting == korting));
+
+            // Store list of tickets in cart
+            Session["cart"] = cart;
+
+            // Redirect to cart
+            Response.Redirect("~/Winkelwagen.cshtml");
+        }
+
+        if (!Request["refreshButton"].IsEmpty())
+        {
+            int concertId = Convert.ToInt16(Request.Form["concertId"]);
+            bool korting = Convert.ToBoolean(Request.Form["korting"]);
+            int aantal = Convert.ToInt16(Request.Form.Get("numberOfDiscountTickets?id="+concertId)); 
+            cart.RemoveAll(Ticket => (Ticket.Concert == concertId && Ticket.Korting == korting));
+
+            for (int i = 0; i < aantal; i++)
             {
-                Ticket ticket = new Ticket(concertId, true);
+                Ticket ticket = new Ticket(concertId, korting);
                 cart.Add(ticket);
             }
 
@@ -71,71 +143,6 @@
         }
     }
 
-    // Validation
-    Validation.RequireFields("email");
-
-    // POST request
-    if (!Request["buttonBetalen"].IsEmpty())
-    {
-        if (Validation.IsValid())
-        {
-            if (cart.Any())
-            {
-                // POST request values
-                var email = Request.Form["email"];
-
-                // SQL statement for bestelling insertion (betaald attribute of bestelling is by default FALSE)
-                var statementBestelling = "INSERT INTO Bestellingen (email) VALUES (@0)";
-
-                // Insert new bestelling into database
-                db.Execute(statementBestelling, email);
-
-                // Fetch bestelNr (unique ID) from database
-                var bestelNr = Convert.ToInt32(db.QueryValue("SELECT @@IDENTITY")); // // @@IDENTITY retrieves last auto generated id (auto_incremented) of this (current) connection
-
-                // SQL statement for ticket insertion
-                var statementTicket = "INSERT INTO Tickets (kindOf65plus, concertId, bestel_nr) VALUES (@0, @1, @2)";
-
-                // Loop through cart, add each ticket with it attributes to the database:
-                // linked to the bestelling created earlier, which is still unpaid: which
-                // makes the tickets invalid for now!!!
-                foreach (Ticket ticket in cart)
-                {
-                    // Check if this is a discount ticket
-                    if (ticket.Korting)
-                    {
-                        db.Execute(statementTicket, 1, ticket.Concert, bestelNr);
-                    }
-                    else
-                    {
-                        db.Execute(statementTicket, 0, ticket.Concert, bestelNr);
-                    }
-                }
-
-                // Remove everything from cart (session) and abandon session
-                Session.RemoveAll();
-                Session.Abandon();
-
-                // Redirect to payment page with bestelNr in the request
-                // bestelNr makes it possible to retrieve all tickets linked to this bestelling
-                if (!WebSecurity.IsAuthenticated)
-                {
-                    Response.Redirect("~/Betalen.cshtml?id=" + bestelNr);
-                }
-
-                else
-                {
-                    var betaalStatement = "UPDATE Bestellingen SET betaald = 1 WHERE id = @0";
-                    db.Execute(betaalStatement, bestelNr);
-                    Response.Redirect("~/TicketGenereren.cshtml?id=" + bestelNr);
-                }
-            }
-
-            else
-            {
-                Validation.AddFormError("Winkelwagen is leeg.");
-            }
-        }
     }
 }
 <div class="container" id="body">
@@ -161,7 +168,7 @@
                         {
                             int aantal = 0;
                             var concertName = "";
-                            decimal concertPrice = 0.00m;
+                            decimal concertPrice = 0;
                             DateTime datum = DateTime.MinValue;
                             foreach (Ticket ticket in cart)
                             {
@@ -177,6 +184,8 @@
                                 }
                             }
                             var subtotal = aantal * concertPrice;
+                            string sub = subtotal.ToString("c");
+                            string prijs = concertPrice.ToString("c");
                             if (aantal != 0)
                             {
                                 <tr>
@@ -188,18 +197,19 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td data-th="Prijs">&euro; @concertPrice</td>
+                                    <td data-th="Prijs">@prijs</td>
                                     <td data-th="Aantal">
-                                        <form method="post">
+                                        <form method="get">
                                             <input name="numberOfDiscountTickets?id=@concert.id" type="number" class="form-control text-center" value="@aantal">
                                         </form>
                                     </td>
-                                    <td data-th="Subtotal" class="text-center">&euro; @subtotal</td>
+                                    <td data-th="Subtotal" class="text-center">@sub</td>
                                     <td class="actions" data-th="">
                                         <form method="post">
-                                            <button name="refreshButton" class="btn btn-info btn-sm" type="submit"><i class="fa fa-refresh"></i></button>
-                                            <button class="btn btn-danger btn-sm" type="submit"><i class="fa fa-trash-o"></i></button>
+                                            @*<button name="refreshButton" class="btn btn-info btn-sm" type="submit" value="refresh"><i class="fa fa-refresh"></i></button>*@
+                                            <button name="deleteButton" class="btn btn-danger btn-sm" type="submit" value="delete"><i class="fa fa-trash-o"></i></button>
                                             <input type="hidden" name="concertId" value="@concert.id" />
+                                            <input type="hidden" name="korting" value="true" />
                                         </form>
                                     </td>
                                 </tr>
@@ -211,7 +221,7 @@
                                 {
                                     if (ticket.Concert == concert.id)
                                     {
-                                        concertPrice = concert.prijs * 1.00m;
+                                        concertPrice = concert.prijs;
                                         concertName = concert.naam.ToString();
                                         datum = concert.datum;
                                         aantal++;
@@ -219,6 +229,8 @@
                                 }
                             }
                             subtotal = aantal * concertPrice;
+                            sub = subtotal.ToString("c");
+                            prijs = concertPrice.ToString("c");
                             if (aantal != 0)
                             {
                                 <tr>
@@ -230,18 +242,19 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td data-th="Prijs">&euro; @concertPrice</td>
+                                    <td data-th="Prijs">@prijs</td>
                                     <td data-th="Aantal">
-                                        <form method="post">
-                                            <input name="numberOfTickets?id=@concert.id" type="number" class="form-control text-center" value="@aantal">
+                                        <form method="get">
+                                            <input name="numberOfTickets" type="number" class="form-control text-center" value="@aantal">
                                         </form>
                                     </td>
-                                    <td data-th="Subtotal" class="text-center">&euro; @subtotal</td>
+                                    <td data-th="Subtotal" class="text-center">@sub</td>
                                     <td class="actions" data-th="">
                                         <form method="post">
-                                            <button name="refreshButton" class="btn btn-info btn-sm" type="submit"><i class="fa fa-refresh"></i></button>
-                                            <button class="btn btn-danger btn-sm" type="submit"><i class="fa fa-trash-o"></i></button>
+                                            @*<button name="refreshButton" class="btn btn-info btn-sm" type="submit" value="refresh"><i class="fa fa-refresh"></i></button>*@
+                                            <button name="deleteButton" class="btn btn-danger btn-sm" type="submit" value="delete"><i class="fa fa-trash-o"></i></button>
                                             <input type="hidden" name="concertId" value="@concert.id" />
+                                            <input type="hidden" name="korting" value="false" />
                                         </form>
                                     </td>
                                 </tr>
