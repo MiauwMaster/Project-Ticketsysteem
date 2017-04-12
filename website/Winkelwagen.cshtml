@@ -207,7 +207,7 @@
                                     <td data-th="Aantal">
                                         <form method="post">
                                             <div class="input-group">
-                                                <input name="numberOfTickets" type="number" class="form-control text-center" id="regtick" value="@aantal">
+                                                <input name="numberOfTickets" type="number" class="form-control text-center" id="regtick" min="0" step="1" value="@aantal">
                                                 <span class="input-group-btn">
                                                     <button name="refreshButton" class="btn btn-info btn-sm" data-target="regtick" type="submit" value="refresh"><i class="fa fa-refresh"></i></button>
                                                 </span>
@@ -256,7 +256,7 @@
                                     <td data-th="Aantal">
                                         <form method="post">
                                             <div class="input-group">
-                                                <input name="numberOfTickets" type="number" class="form-control text-center" id="regtick" value="@aantal">
+                                                <input name="numberOfTickets" type="number" class="form-control text-center" id="regtick" min="0" step="1" value="@aantal">
                                                 <span class="input-group-btn">
                                                     <button name="refreshButton" class="btn btn-info btn-sm" data-target="regtick" type="submit" value="refresh"><i class="fa fa-refresh"></i></button>
                                                 </span>
@@ -283,7 +283,7 @@
                     <tr>
                         <td><a href="~/Default.cshtml" class="btn btn-warning"><i class="fa fa-angle-left"></i> Meer tickets kopen</a></td>
                         <td colspan="2" class="hidden-xs"></td>
-                        <td class="hidden-xs text-center"><strong>&euro;@total</strong></td>
+                        <td class="hidden-xs text-center"><strong>&euro;@total.ToString("0.00")</strong></td>
                         <td></td>
                     </tr>
                 </tfoot>
@@ -294,15 +294,17 @@
                     </div>
                     <div class="col-md-6">
                         <form method="post">
-                            <p>
                                 @if (!WebSecurity.IsAuthenticated)
                                 {
-                                <label class="centertext" for="email">Uw e-mailadres:</label>
-                               
+                                <p class="centertext"><label class="centertext" for="email">Uw e-mailadres:</label></p>
+
                                 <input type="text" name="email" value="@Request.Form["email"]" class="btn-block" required />
-                                }
                                 @Html.ValidationMessage("email")
-                            </p>
+                                }
+                                else
+                                {
+                                    <p class="centertext">U bent ingelogd als beheerder en kunt nu tickets afrekenen voor de kassa.</p>
+                                }
                             <p>
                                 <input name="buttonBetalen" type="submit" class="btn btn-success btn-block" value="Bestelling Betalen" />
                             </p>

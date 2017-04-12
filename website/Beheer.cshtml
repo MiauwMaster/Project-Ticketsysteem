@@ -40,7 +40,7 @@
         <div class="col-md-6">
             <h3 class="text-center">Welkom!</h3>
             <hr />
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla suscipit tincidunt condimentum. Quisque sit amet vehicula tellus, ut faucibus elit. Morbi fringilla nulla at ex molestie ullamcorper. Mauris nec porttitor nisi. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Aenean elementum massa id egestas elementum. Ut pretium nibh in ligula tincidunt condimentum. Duis a malesuada enim.</p>
+            <p id="beschrijving">U bent nu ingelogd als beheerder. Hier kunt u verschillende handelingen uitvoeren. Zo kunt u concerten toevoegen, wijzigen of informatie erover ophalen. Daarnaast is er ook de mogelijk om extra zalen toe te voegen. Verder is het nu mogelijk om tickets aan de kassa te verkopen door simpelweg tickets aan de winkelwagen toe te voegen en dan gewoon op betalen te drukken. Druk op uitloggen indien u niet meer iets hoeft te doen.</p>
             <form method="post">
                 <p>
                     <input name="buttonLogout" type="submit" style="width:100%" class="btn btn-danger" value="Uitloggen" />
@@ -78,99 +78,70 @@
                         </tbody>
                     </table>
                 </div>
-                @*<div class="panel-footer">
-                <div class="row">
-                    <div class="col col-xs-4">
-                        Page 1 of 5
-                    </div>
-                    <div class="col col-xs-8">
-                        <ul class="pagination hidden-xs pull-right">
-                            <li><a href="#">1</a></li>
-                            <li><a href="#">2</a></li>
-                            <li><a href="#">3</a></li>
-                            <li><a href="#">4</a></li>
-                            <li><a href="#">5</a></li>
-                        </ul>
-                        <ul class="pagination visible-xs pull-right">
-                            <li><a href="#">«</a></li>
-                            <li><a href="#">»</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>*@
             </div>
         </div>
     </div>
     <hr />
-    <div>
-        <div class="panel panel-default panel-table">
-            <div class="panel-heading">
-                <div class="row">
-                    <div class="col col-xs-6">
-                        <h3 class="panel-title">Concerten</h3>
-                    </div>
-                    <div class="col col-xs-6 text-right">
-                        <a href="~/ConcertToevoegen.cshtml" class="btn btn-sm btn-danger btn-create">Nieuw concert</a>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default panel-table">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col col-xs-6">
+                            <h3 class="panel-title">Concerten</h3>
+                        </div>
+                        <div class="col col-xs-6 text-right">
+                            <a href="~/ConcertToevoegen.cshtml" class="btn btn-sm btn-danger btn-create">Nieuw concert</a>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="panel-body">
-                <table class="table-hover table table-striped table-bordered table-list">
-                    <thead>
-                        <tr>
-                            <th>Datum</th>
-                            <th>Tijd</th>
-                            <th>Naam</th>
-                            <th>Artiest</th>
-                            <th>Prijs</th>
-                            <th class="text-center"><em class="fa fa-cog"></em></th>
-                        </tr>
-                    </thead>
-                    <tbody id="myTable">
-                        @foreach (var item in dataConcerten)
-                        {
-                            DateTime datum = item.Datum;
-
+                <div class="panel-body">
+                    <table class="table-hover table table-striped table-bordered table-list">
+                        <thead>
                             <tr>
-                                <td class="agenda-date active" rowspan="1">
-                                    <div class="dayofmonth">@datum.Day</div>
-                                    <div class="dayofweek">@datum.ToString("dddd", ci)</div>
-                                    <div class="shortdate text-muted">@datum.ToString("MMMM", ci), @datum.Year</div>
-                                </td>
-                                <td>
-                                    @datum.ToString("H:mm")
-                                </td>
-                                <td>
-                                    @item.Naam
-                                </td>
-                                <td>
-                                    @item.Artiest
-                                </td>
-                                <td>
-                                    &euro;@item.Prijs.ToString("0.00")
-                                </td>
-                                <td align="center">
-                                    <a href="~/ConcertInfo.cshtml?id=@item.ID" class="btn btn-secondary"><i class="fa fa-info"></i></a>
-                                    <a href="~/ConcertWijzigen.cshtml?id=@item.ID" class="btn btn-secondary"><i class="fa fa-pencil"></i></a>
-                                </td>
+                                <th>Datum</th>
+                                <th>Tijd</th>
+                                <th>Naam</th>
+                                <th>Artiest</th>
+                                <th>Prijs</th>
+                                <th class="text-center"><em class="fa fa-cog"></em></th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-            @*<div class="panel-footer">
-                <div class="row">
-                    <div class="col col-xs-4">
-                    </div>
-                    <div class="col col-xs-8">
-                        <ul class="pagination hidden-xs pull-right" id="myPager"></ul>
-                        <ul class="pagination visible-xs pull-right">
-                            <li><a href="#">«</a></li>
-                            <li><a href="#">»</a></li>
-                        </ul>
-                    </div>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in dataConcerten)
+                            {
+                                DateTime datum = item.Datum;
+
+                                <tr>
+                                    <td class="agenda-date active" rowspan="1">
+                                        <div class="dayofmonth">@datum.Day</div>
+                                        <div class="dayofweek">@datum.ToString("dddd", ci)</div>
+                                        <div class="shortdate text-muted">@datum.ToString("MMMM", ci), @datum.Year</div>
+                                    </td>
+                                    <td>
+                                        @datum.ToString("H:mm")
+                                    </td>
+                                    <td>
+                                        @item.Naam
+                                    </td>
+                                    <td>
+                                        @item.Artiest
+                                    </td>
+                                    <td>
+                                        &euro;@item.Prijs.ToString("0.00")
+                                    </td>
+                                    <td align="center">
+                                        <a href="~/ConcertInfo.cshtml?id=@item.ID" class="btn btn-secondary"><i class="fa fa-info"></i></a>
+                                        <a href="~/ConcertWijzigen.cshtml?id=@item.ID" class="btn btn-secondary"><i class="fa fa-pencil"></i></a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
                 </div>
-            </div>*@
+            </div>
+            <br />
+            <br />
         </div>
     </div>
 </div>

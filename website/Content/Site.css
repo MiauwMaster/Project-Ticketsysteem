@@ -6,13 +6,6 @@
     clear: both;
 }
 
-.agenda .agenda-date, 
-.agenda .agenda-beschrijving, 
-.agenda .agenda-prijs, 
-.agenda .agenda-bestel { 
-    width: 9em; 
-}
-
 .agenda .agenda-date .dayofmonth {
     width: 1.2em;
     font-size: 2em;
@@ -24,8 +17,6 @@
 .agenda .agenda-date .shortdate {
     font-size: 0.75em; 
 }
-
-.agenda .agenda-time { width: 9em; } 
 
 /*_____MAIN LAYOUT_____*/
 
@@ -42,7 +33,7 @@ html, body {
     min-height: 80vh;
     box-shadow: 0 0 0.5em #888888;
     z-index: 0;
-    padding-bottom: 1em;
+    padding-bottom: 3.5em;
     padding-top: 3.5em;
 }
 
@@ -57,9 +48,7 @@ html, body {
     margin: auto;
 }
 
-/*#background {
-    background-color: maroon;
-}*/
+/*_____FOOTER_____*/
 
 /*_____OVER_____*/
 #gmap_canvas {
@@ -219,28 +208,34 @@ input[type="checkbox"] {
 .field-validation-error {
     color: #e80c4d;
     font-weight: bold;
+    text-align: center;
 }
 
 .field-validation-valid {
     display: none;
+    text-align: center;
 }
 
 input.input-validation-error {
     border: 1px solid #e80c4d;
+    text-align: center;
 }
 
 input[type="checkbox"].input-validation-error {
     border: 0 none;
+    text-align: center;
 }
 
 .validation-summary-errors {
     color: #e80c4d;
     font-weight: bold;
     font-size: 1.1em;
+    text-align: center;
 }
 
 .validation-summary-valid {
     display: none;
+    text-align: center;
 }
 
 /*_____MOBIEL_____*/
