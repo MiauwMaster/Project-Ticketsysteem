@@ -136,7 +136,7 @@
 }
 <div id="body" class="container">
     <h2 class="toptext">@name</h2>
-    <p class="ondertekst"><b>Met:</b> @artist &#9;&#9;<b>Prijs:</b>€ @price.ToString("0.00") &#9;&#9; <b>Wanneer:</b> @date.ToString("dddd", ci) @date.Day @date.ToString("MMMM", ci) @date.Year</p>
+    <p class="ondertekst"><b>Met:</b> @artist &#9;&#9; <b>Prijs: </b>&euro;@price.ToString("0.00") &#9;&#9; <b>Wanneer:</b> @date.ToString("dddd", ci) @date.Day @date.ToString("MMMM", ci) @date.Year</p>
     <hr />
     @Html.ValidationSummary()
     <div class="row">

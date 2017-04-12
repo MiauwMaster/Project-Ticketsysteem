@@ -81,7 +81,7 @@
         </div>
         <div class="col-md-4 payment">
             @Html.ValidationSummary()
-            <h3 class="centertext">Bedrag: &euro; @total</h3>
+            <h3 class="centertext">Bedrag: &euro;@total.ToString("0.00")</h3>
             <br />
             <p class="centertext">Kies uw bank</p>
             <form method="post">

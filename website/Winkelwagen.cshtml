@@ -192,8 +192,6 @@
                                 }
                             }
                             var subtotal = aantal * concertPrice;
-                            string sub = subtotal.ToString("0.00");
-                            string prijs = concertPrice.ToString("0.00");
                             if (aantal != 0)
                             {
                                 <tr>
@@ -205,7 +203,7 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td data-th="Prijs">€ @prijs</td>
+                                    <td data-th="Prijs">&euro;@concertPrice.ToString("0.00")</td>
                                     <td data-th="Aantal">
                                         <form method="post">
                                             <div class="input-group">
@@ -218,7 +216,7 @@
                                             </div>
                                         </form>
                                     </td>
-                                    <td data-th="Subtotal" class="text-center">€ @sub</td>
+                                    <td data-th="Subtotal" class="text-center">&euro;@subtotal.ToString("0.00")</td>
                                     <td class="actions" data-th="">
                                         <form method="post">
                                             <button name="deleteButton" class="btn btn-danger btn-sm" type="submit" value="delete"><i class="fa fa-trash-o"></i></button>
@@ -243,8 +241,6 @@
                                 }
                             }
                             subtotal = aantal * concertPrice;
-                            sub = subtotal.ToString("0.00");
-                            prijs = concertPrice.ToString("0.00");
                             if (aantal != 0)
                             {
                                 <tr>
@@ -256,7 +252,7 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td data-th="Prijs">€ @prijs</td>
+                                    <td data-th="Prijs">&euro;@concertPrice.ToString("0.00")</td>
                                     <td data-th="Aantal">
                                         <form method="post">
                                             <div class="input-group">
@@ -269,7 +265,7 @@
                                             </div>
                                         </form>
                                     </td>
-                                    <td data-th="Subtotal" class="text-center">€ @sub</td>
+                                    <td data-th="Subtotal" class="text-center">&euro;@subtotal.ToString("0.00")</td>
                                     <td class="actions" data-th="">
                                         <form method="post">
                                             
@@ -287,7 +283,7 @@
                     <tr>
                         <td><a href="~/Default.cshtml" class="btn btn-warning"><i class="fa fa-angle-left"></i> Meer tickets kopen</a></td>
                         <td colspan="2" class="hidden-xs"></td>
-                        <td class="hidden-xs text-center"><strong>&euro; @total</strong></td>
+                        <td class="hidden-xs text-center"><strong>&euro;@total</strong></td>
                         <td></td>
                     </tr>
                 </tfoot>
