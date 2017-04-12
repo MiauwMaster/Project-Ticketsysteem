@@ -17,8 +17,8 @@
     var artist = "";
     var description = "";
     var theater = 0;
-    var price = Decimal.One;
-    var date = DateTime.Now;
+    var price = new Decimal();
+    var date = new DateTime();
 
     // GET request
     if (!IsPost)
@@ -80,73 +80,73 @@
     <div class="row">
         <div class="col-lg-3"></div>
         <div class="col-lg-6">
-        @Html.ValidationSummary()
-        <form method="post">
-            <fieldset>
-                <legend>Concert Informatie</legend>
+            @Html.ValidationSummary()
+            <form method="post">
+                <fieldset>
+                    <legend>Concert Informatie</legend>
 
-                <p class="centertext">
-                    <label for="name">Concert naam:</label>
+                    <p class="centertext">
+                        <label for="name">Concert naam:</label>
                     </p>
-                <p class="centertext">
-                    <input type="text" name="name" value="@name" />
-                </p>
-                <br />
-
-                <p class="centertext">
-                    <label for="artist">Artiest:</label>
-                </p>
-                <p class="centertext">
-                    <input type="text" name="artist" value="@artist" />
-                </p>
-                <br />
-
-                <p class="centertext">
-                    <label for="description">Beschrijving:</label>
+                    <p class="centertext">
+                        <input type="text" name="name" value="@name" required />
                     </p>
-                <p class="centertext">
-                    <textarea name="description">@description</textarea>
-                </p>
-                <br />
+                    <br />
 
-                <p class="centertext">
-                    <label for="theater">Zaal:</label>
-                    <select name="theater" required>
-                        @foreach (var item in db.Query("SELECT * FROM Zalen"))
-                        {
-                            <option value="@item.zaal_nr">Zaal @item.zaal_nr: @item.aantal_plekken plekken</option>
-                        }
-                    </select>
-                </p>
-                <br />
-
-                <p class="centertext">
-                    <label for="price">Prijs:</label>
-                </p>
-                <p class="centertext">
-                    <input type="number" name="price" step="0.01" min="0.01" max="99" value="@price" required />
-                </p>
-                <br />
-
-                <p class="centertext">
-                    <label for="date">Datum:</label>
+                    <p class="centertext">
+                        <label for="artist">Artiest:</label>
                     </p>
-                <p class="centertext">
-                    <input type="datetime-local" name="date" value="@date" />
-                </p>
-                <br />
+                    <p class="centertext">
+                        <input type="text" name="artist" value="@artist" required />
+                    </p>
+                    <br />
 
-                <input type="hidden" name="concertId" value="@concertId" />
+                    <p class="centertext">
+                        <label for="description">Beschrijving:</label>
+                    </p>
+                    <p class="centertext">
+                        <textarea name="description" required>@description</textarea>
+                    </p>
+                    <br />
 
-                <p class="centertext">
-                    <input type="submit" class="btn btn-danger" value="Wijzig Concert" />
-                </p>
-            </fieldset>
-        </form>
-        <br />
-        <p class="centertext">
-            <a href="~/Beheer.cshtml" class="btn btn-danger"><i class="fa fa-arrow-left"></i> Terug naar beheer</a>
-        </p>
+                    <p class="centertext">
+                        <label for="theater">Zaal:</label>
+                        <select name="theater" required>
+                            @foreach (var item in db.Query("SELECT * FROM Zalen"))
+                            {
+                                <option value="@item.zaal_nr">Zaal @item.zaal_nr: @item.aantal_plekken plekken</option>
+                            }
+                        </select>
+                    </p>
+                    <br />
+
+                    <p class="centertext">
+                        <label for="price">Prijs:</label>
+                    </p>
+                    <p class="centertext">
+                        <input type="number" name="price" step="0.01" min="0.01" max="99" value="@price" required />
+                    </p>
+                    <br />
+
+                    <p class="centertext">
+                        <label for="date">Datum:</label>
+                    </p>
+                    <p class="centertext">
+                        <input type="datetime-local" name="date" value="@date" required />
+                    </p>
+                    <br />
+
+                    <input type="hidden" name="concertId" value="@concertId" />
+
+                    <p class="centertext">
+                        <input type="submit" class="btn btn-danger" value="Wijzig Concert" />
+                    </p>
+                </fieldset>
+            </form>
+            <br />
+            <p class="centertext">
+                <a href="~/Beheer.cshtml" class="btn btn-danger"><i class="fa fa-arrow-left"></i> Terug naar beheer</a>
+            </p>
         </div>
         <div class="col-lg-3"></div>
     </div>

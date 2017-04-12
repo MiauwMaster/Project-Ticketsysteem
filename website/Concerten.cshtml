@@ -50,7 +50,7 @@
                                     @item.Artiest
                                 </td>
                                 <td class="agenda-prijs">
-                                    @item.Prijs.ToString("c")
+                                    € @item.Prijs.ToString("0.00")
                                 </td>
                                 <td class="agenda-bestel">
                                     <a href="/TicketBestellen.cshtml?id=@item.ID"><input type="submit" name="buttonTicket" value="Bestel" class="btn btn-danger" /></a>
