@@ -10,56 +10,70 @@
     var statement = "SELECT * FROM Concerten WHERE datum > @0 ORDER BY datum ASC";
     var selectedData = db.Query(statement, DateTime.Now);
 }
+
+<div id="fb-root"></div>
+<script>
+(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/nl_NL/sdk.js#xfbml=1&version=v2.8";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
 <div id="body" class="container">
     <h2 class="toptext">Aankomende concerten</h2>
     <hr />
-        <div class="agenda">
-            <div class="table-responsive">
-                <table class="table table-condensed table-bordered">
-                    <thead>
+    <div class="agenda">
+        <div class="table-responsive">
+            <table class="table table-condensed table-bordered">
+                <thead>
+                    <tr>
+                        <th>Datum</th>
+                        <th>Tijd</th>
+                        <th>Naam</th>
+                        <th>Artiest</th>
+                        <th>Prijs</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @foreach (var item in selectedData)
+                    {
+                        DateTime datum = item.Datum;
+
                         <tr>
-                            <th>Datum</th>
-                            <th>Tijd</th>
-                            <th>Naam</th>
-                            <th>Artiest</th>
-                            <th>Prijs</th>
-                            <th></th>
+                            <td class="agenda-date active" rowspan="1">
+                                <div class="dayofmonth">@datum.Day</div>
+                                <div class="dayofweek">@datum.ToString("dddd", ci)</div>
+                                <div class="shortdate text-muted">@datum.ToString("MMMM", ci), @datum.Year</div>
+                            </td>
+                            <td class="agenda-time">
+                                @datum.ToString("H:mm")
+                            </td>
+                            <td class="agenda-events">
+                                <div class="agenda-event">
+                                    @item.Naam
+                                </div>
+                            </td>
+                            <td class="agenda-beschrijving">
+                                @item.Artiest
+                            </td>
+                            <td class="agenda-prijs">
+                                € @item.Prijs.ToString("0.00")
+                            </td>
+                            <td class="agenda-bestel">
+                                <a href="/TicketBestellen.cshtml?id=@item.ID"><input type="submit" name="buttonTicket" value="Bestel" class="btn btn-danger" /></a>
+                            </td>
+                            <td class="agenda-social">
+                                <div class="fb-share-button" data-href="@Request.Url" data-layout="button_count" data-mobile-iframe="true"><a class="fb-xfbml-parse-ignore" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=@Request.Url&amp;src=sdkpreparse">Delen</a></div>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
+                    }
 
-                        @foreach (var item in selectedData)
-                        {
-                            DateTime datum = item.Datum;
-
-                            <tr>
-                                <td class="agenda-date active" rowspan="1">
-                                    <div class="dayofmonth">@datum.Day</div>
-                                    <div class="dayofweek">@datum.ToString("dddd", ci)</div>
-                                    <div class="shortdate text-muted">@datum.ToString("MMMM", ci), @datum.Year</div>
-                                </td>
-                                <td class="agenda-time">
-                                    @datum.ToString("H:mm")
-                                </td>
-                                <td class="agenda-events">
-                                    <div class="agenda-event">
-                                        @item.Naam
-                                    </div>
-                                </td>
-                                <td class="agenda-beschrijving">
-                                    @item.Artiest
-                                </td>
-                                <td class="agenda-prijs">
-                                    € @item.Prijs.ToString("0.00")
-                                </td>
-                                <td class="agenda-bestel">
-                                    <a href="/TicketBestellen.cshtml?id=@item.ID"><input type="submit" name="buttonTicket" value="Bestel" class="btn btn-danger" /></a>
-                                </td>
-                            </tr>
-                        }
-
-                    </tbody>
-                </table>
-            </div>
+                </tbody>
+            </table>
         </div>
+    </div>
 </div>

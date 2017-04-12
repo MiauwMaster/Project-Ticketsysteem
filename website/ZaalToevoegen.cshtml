@@ -20,8 +20,8 @@
             var statement = "INSERT INTO Zalen (aantal_plekken) VALUES (@0)";
             db.Execute(statement, numberOfSpots);
 
-            // Redirect to concerten toevoegen
-            Response.Redirect("~/ConcertToevoegen.cshtml");
+            // Redirect to beheer
+            Response.Redirect("~/Beheer.cshtml");
         }
     }
 }
