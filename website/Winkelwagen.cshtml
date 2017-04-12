@@ -21,7 +21,7 @@
     var concertenRow = db.Query(concertData);
 
     decimal total = 0.00m;
-    // Loop through all tickets that belong to this bestelling
+
     foreach (var ticket in cart)
     {
         var korting = ticket.Korting;
@@ -134,7 +134,7 @@
         {
             int concertId = Convert.ToInt16(Request.Form["concertId"]);
             bool korting = Convert.ToBoolean(Request.Form["korting"]);
-            int aantal = Convert.ToInt16(Request.Form.Get("numberOfDiscountTickets?id="+concertId)); 
+            int aantal = Convert.ToInt16(Request.Form.Get("numberOfTickets")); 
             cart.RemoveAll(Ticket => (Ticket.Concert == concertId && Ticket.Korting == korting));
 
             for (int i = 0; i < aantal; i++)
@@ -166,9 +166,9 @@
                     <tr>
                         <th style="width:50%">Concert</th>
                         <th style="width:10%">Prijs</th>
-                        <th style="width:8%">Aantal</th>
+                        <th style="width:10%" class="text-center">Aantal</th>
                         <th style="width:22%" class="text-center">Subtotaal</th>
-                        <th style="width:10%"></th>
+                        <th style="width:8%"></th>
                     </tr>
                 </thead>
                     <tbody>
@@ -207,14 +207,20 @@
                                     </td>
                                     <td data-th="Prijs">@prijs</td>
                                     <td data-th="Aantal">
-                                        <form method="get">
-                                            <input name="numberOfDiscountTickets?id=@concert.id" type="number" class="form-control text-center" value="@aantal">
+                                        <form method="post">
+                                            <div class="input-group">
+                                                <input name="numberOfTickets" type="number" class="form-control text-center" id="regtick" value="@aantal">
+                                                <span class="input-group-btn">
+                                                    <button name="refreshButton" class="btn btn-info btn-sm" data-target="regtick" type="submit" value="refresh"><i class="fa fa-refresh"></i></button>
+                                                </span>
+                                                <input type="hidden" name="concertId" value="@concert.id" />
+                                                <input type="hidden" name="korting" value="true" />
+                                            </div>
                                         </form>
                                     </td>
                                     <td data-th="Subtotal" class="text-center">@sub</td>
                                     <td class="actions" data-th="">
                                         <form method="post">
-                                            @*<button name="refreshButton" class="btn btn-info btn-sm" type="submit" value="refresh"><i class="fa fa-refresh"></i></button>*@
                                             <button name="deleteButton" class="btn btn-danger btn-sm" type="submit" value="delete"><i class="fa fa-trash-o"></i></button>
                                             <input type="hidden" name="concertId" value="@concert.id" />
                                             <input type="hidden" name="korting" value="true" />
@@ -252,14 +258,21 @@
                                     </td>
                                     <td data-th="Prijs">@prijs</td>
                                     <td data-th="Aantal">
-                                        <form method="get">
-                                            <input name="numberOfTickets" type="number" class="form-control text-center" value="@aantal">
+                                        <form method="post">
+                                            <div class="input-group">
+                                                <input name="numberOfTickets" type="number" class="form-control text-center" id="regtick" value="@aantal">
+                                                <span class="input-group-btn">
+                                                    <button name="refreshButton" class="btn btn-info btn-sm" data-target="regtick" type="submit" value="refresh"><i class="fa fa-refresh"></i></button>
+                                                </span>
+                                                <input type="hidden" name="concertId" value="@concert.id" />
+                                                <input type="hidden" name="korting" value="false" />
+                                            </div>
                                         </form>
                                     </td>
                                     <td data-th="Subtotal" class="text-center">@sub</td>
                                     <td class="actions" data-th="">
                                         <form method="post">
-                                            @*<button name="refreshButton" class="btn btn-info btn-sm" type="submit" value="refresh"><i class="fa fa-refresh"></i></button>*@
+                                            
                                             <button name="deleteButton" class="btn btn-danger btn-sm" type="submit" value="delete"><i class="fa fa-trash-o"></i></button>
                                             <input type="hidden" name="concertId" value="@concert.id" />
                                             <input type="hidden" name="korting" value="false" />

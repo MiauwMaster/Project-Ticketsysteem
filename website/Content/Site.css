@@ -34,8 +34,7 @@
 }
 
 html, body {
-    background: url(../Images/andywarhol-soup.jpg) center center fixed;
-    background-size: 20em;
+    background-size: cover;
 }
 
 #body {
@@ -80,7 +79,7 @@ html, body {
 }
 
 .label {
-    margin-bottom: 0em;
+    margin-bottom: 0;
 }
 
 /*_____BEHEER INFO_____*/
