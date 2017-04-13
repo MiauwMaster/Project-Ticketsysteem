@@ -68,7 +68,7 @@
 
         //Generate QR Code
         QRCodeGenerator qrGenerator = new QRCodeGenerator();
-        QRCodeData qrCodeData = qrGenerator.CreateQrCode("TODO: URL invoegen" + ticketID, QRCodeGenerator.ECCLevel.Q);
+        QRCodeData qrCodeData = qrGenerator.CreateQrCode("http://ticketsysteem.koenlukkien.nl/TicketScannen.php?id" + ticketID, QRCodeGenerator.ECCLevel.Q);
         QRCode qrCode = new QRCode(qrCodeData);
         System.Drawing.Image qrCodeImage = qrCode.GetGraphic(5);
 
